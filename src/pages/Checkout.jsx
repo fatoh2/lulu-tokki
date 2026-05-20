@@ -14,7 +14,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 function Field({ label, required, error, children }) {
@@ -29,13 +29,6 @@ function Field({ label, required, error, children }) {
   );
 }
 
-const PROMO_CODES = {
-  HANOOK10: { pct: 10 },
-  HANOOK20: { pct: 20 },
-  WELCOME:  { pct: 15 },
-  KOREA:    { pct: 5  },
-};
-
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
@@ -47,19 +40,29 @@ export default function Checkout() {
   const [promoInput, setPromoInput] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null); // { code, pct }
   const [promoError, setPromoError] = useState('');
+  const [promoChecking, setPromoChecking] = useState(false);
 
   const shipping = totalPrice >= 100 ? 0 : 15;
   const discountAmt = appliedPromo ? +(totalPrice * appliedPromo.pct / 100).toFixed(2) : 0;
   const total = totalPrice - discountAmt + shipping;
 
-  const applyPromo = () => {
+  const applyPromo = async () => {
     const code = promoInput.trim().toUpperCase();
-    if (PROMO_CODES[code]) {
-      setAppliedPromo({ code, pct: PROMO_CODES[code].pct });
-      setPromoError('');
-      setPromoInput('');
-    } else {
+    if (!code) return;
+    setPromoChecking(true);
+    try {
+      const snap = await getDoc(doc(db, 'promoCodes', code));
+      if (snap.exists() && snap.data().active) {
+        setAppliedPromo({ code, pct: snap.data().pct });
+        setPromoError('');
+        setPromoInput('');
+      } else {
+        setPromoError(t('promoInvalid'));
+      }
+    } catch {
       setPromoError(t('promoInvalid'));
+    } finally {
+      setPromoChecking(false);
     }
   };
 
@@ -300,8 +303,8 @@ export default function Checkout() {
                       onFocus={e => { if (!promoError) e.target.style.borderColor = '#e8002d'; }}
                       onBlur={e => { if (!promoError) e.target.style.borderColor = '#e5e7eb'; }}
                     />
-                    <button type="button" onClick={applyPromo} style={{ padding: '9px 14px', borderRadius: 9, border: 'none', background: '#1a1a2e', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer', flexShrink: 0 }}>
-                      {t('applyPromoBtn')}
+                    <button type="button" onClick={applyPromo} disabled={promoChecking} style={{ padding: '9px 14px', borderRadius: 9, border: 'none', background: promoChecking ? '#9ca3af' : '#1a1a2e', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: promoChecking ? 'wait' : 'pointer', flexShrink: 0 }}>
+                      {promoChecking ? '...' : t('applyPromoBtn')}
                     </button>
                   </div>
                 )}

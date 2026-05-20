@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
+import { storage, db } from '../firebase';
+import { collection, getDocs, setDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useProducts } from '../context/ProductsContext';
 import toast from 'react-hot-toast';
 
@@ -45,6 +46,86 @@ export default function Admin() {
   const [imagePreview, setImagePreview] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+
+  // ── Promo codes state ──
+  const [promoCodes, setPromoCodes] = useState([]);
+  const [codesLoading, setCodesLoading] = useState(false);
+  const [codeForm, setCodeForm] = useState({ code: '', pct: 10, active: true });
+  const [codeErrors, setCodeErrors] = useState({});
+  const [editingCode, setEditingCode] = useState(null);
+  const [confirmDeleteCode, setConfirmDeleteCode] = useState(null);
+
+  useEffect(() => {
+    setCodesLoading(true);
+    getDocs(collection(db, 'promoCodes'))
+      .then(snap => {
+        const arr = [];
+        snap.forEach(d => arr.push({ code: d.id, ...d.data() }));
+        arr.sort((a, b) => a.code.localeCompare(b.code));
+        setPromoCodes(arr);
+      })
+      .finally(() => setCodesLoading(false));
+  }, []);
+
+  const handleSaveCode = async () => {
+    const errs = {};
+    const code = codeForm.code.trim().toUpperCase();
+    if (!code) errs.code = 'الكود مطلوب';
+    if (!codeForm.pct || Number(codeForm.pct) < 1 || Number(codeForm.pct) > 100) errs.pct = 'نسبة 1–100';
+    if (Object.keys(errs).length) { setCodeErrors(errs); return; }
+    const entry = { pct: Number(codeForm.pct), active: codeForm.active };
+    await setDoc(doc(db, 'promoCodes', code), entry);
+    if (editingCode && editingCode !== code) {
+      await deleteDoc(doc(db, 'promoCodes', editingCode));
+      setPromoCodes(prev =>
+        [...prev.filter(c => c.code !== editingCode), { code, ...entry }]
+          .sort((a, b) => a.code.localeCompare(b.code))
+      );
+    } else if (editingCode) {
+      setPromoCodes(prev => prev.map(c => c.code === code ? { code, ...entry } : c));
+    } else {
+      setPromoCodes(prev =>
+        [...prev.filter(c => c.code !== code), { code, ...entry }]
+          .sort((a, b) => a.code.localeCompare(b.code))
+      );
+    }
+    toast.success(`${editingCode ? 'تم تحديث' : 'تم إضافة'} الكود ${code} ✅`, {
+      style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+    });
+    setCodeForm({ code: '', pct: 10, active: true });
+    setCodeErrors({});
+    setEditingCode(null);
+  };
+
+  const handleDeleteCode = async (code) => {
+    await deleteDoc(doc(db, 'promoCodes', code));
+    setPromoCodes(prev => prev.filter(c => c.code !== code));
+    setConfirmDeleteCode(null);
+    toast.success(`تم حذف الكود ${code} ✅`, {
+      style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+    });
+  };
+
+  const toggleCodeActive = async (code, current) => {
+    await updateDoc(doc(db, 'promoCodes', code), { active: !current });
+    setPromoCodes(prev => prev.map(c => c.code === code ? { ...c, active: !current } : c));
+  };
+
+  const seedDefaultCodes = async () => {
+    const defaults = [
+      { code: 'HANOOK10', pct: 10, active: true },
+      { code: 'HANOOK20', pct: 20, active: true },
+      { code: 'WELCOME',  pct: 15, active: true },
+      { code: 'KOREA',    pct: 5,  active: true },
+    ];
+    await Promise.all(defaults.map(({ code, ...rest }) =>
+      setDoc(doc(db, 'promoCodes', code), rest)
+    ));
+    setPromoCodes(defaults);
+    toast.success('تم إضافة الأكواد الافتراضية ✅', {
+      style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+    });
+  };
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
@@ -204,8 +285,8 @@ export default function Admin() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'white', borderRadius: 12, padding: 4, border: '1px solid #e5e7eb', width: 'fit-content' }}>
-        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج']].map(([key, label]) => (
-          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } }} style={{
+        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم']].map(([key, label]) => (
+          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } }} style={{
             padding: '8px 24px', borderRadius: 9, border: 'none',
             background: tab === key ? '#e8002d' : 'transparent',
             color: tab === key ? 'white' : '#6b7280',
@@ -560,6 +641,122 @@ export default function Admin() {
             </div>
           </div>
         </form>
+      )}
+
+      {/* ── Promo Codes Tab ── */}
+      {tab === 'codes' && (
+        <div>
+          {/* Add / Edit form */}
+          <div style={{ background: 'white', borderRadius: 20, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.07)', marginBottom: 20 }}>
+            <h3 style={{ fontWeight: 800, fontSize: 16, color: '#1a1a2e', marginTop: 0, marginBottom: 18, paddingBottom: 12, borderBottom: '2px solid #f3f4f6' }}>
+              {editingCode ? `✏️ تعديل الكود: ${editingCode}` : '➕ إضافة كود خصم'}
+            </h3>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>الكود <span style={{ color: '#e8002d' }}>*</span></label>
+                <input
+                  value={codeForm.code}
+                  onChange={e => { setCodeForm(f => ({ ...f, code: e.target.value.toUpperCase() })); setCodeErrors(v => ({ ...v, code: '' })); }}
+                  placeholder="مثال: SAVE15"
+                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.code ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 160, background: 'white', letterSpacing: 1 }}
+                  onFocus={e => { if (!codeErrors.code) e.target.style.borderColor = '#e8002d'; }}
+                  onBlur={e => { if (!codeErrors.code) e.target.style.borderColor = '#e5e7eb'; }}
+                />
+                {codeErrors.code && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.code}</div>}
+              </div>
+              <div>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>نسبة الخصم % <span style={{ color: '#e8002d' }}>*</span></label>
+                <input
+                  type="number" min="1" max="100"
+                  value={codeForm.pct}
+                  onChange={e => { setCodeForm(f => ({ ...f, pct: e.target.value })); setCodeErrors(v => ({ ...v, pct: '' })); }}
+                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.pct ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 100, background: 'white' }}
+                  onFocus={e => { if (!codeErrors.pct) e.target.style.borderColor = '#e8002d'; }}
+                  onBlur={e => { if (!codeErrors.pct) e.target.style.borderColor = '#e5e7eb'; }}
+                />
+                {codeErrors.pct && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.pct}</div>}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 2 }}>
+                <div onClick={() => setCodeForm(f => ({ ...f, active: !f.active }))} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: codeForm.active ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: codeForm.active ? 3 : 23, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+                </div>
+                <span style={{ fontWeight: 700, fontSize: 13, color: '#374151' }}>فعّال</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, paddingBottom: 2 }}>
+                <button onClick={handleSaveCode} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+                  {editingCode ? '💾 حفظ' : '✅ إضافة'}
+                </button>
+                {editingCode && (
+                  <button onClick={() => { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); }} style={{ padding: '10px 18px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                    إلغاء
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Codes list */}
+          {codesLoading ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af', fontSize: 14 }}>⏳ جاري التحميل...</div>
+          ) : promoCodes.length === 0 ? (
+            <div style={{ background: '#fffbeb', border: '2px solid #fbbf24', borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 15, color: '#92400e' }}>لا توجد أكواد خصم بعد</div>
+                <div style={{ fontSize: 13, color: '#92400e', marginTop: 2 }}>يمكنك إضافة الأكواد يدوياً أو تعبئة الأكواد الافتراضية.</div>
+              </div>
+              <button onClick={seedDefaultCodes} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+                🎟️ إضافة الأكواد الافتراضية
+              </button>
+            </div>
+          ) : (
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 20px', fontSize: 12, fontWeight: 800, color: '#6b7280' }}>
+                <span>الكود</span>
+                <span>الخصم</span>
+                <span>الحالة</span>
+                <span>إجراء</span>
+              </div>
+              {promoCodes.map((c, i) => (
+                <div key={c.code} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, padding: '12px 20px', alignItems: 'center', background: i % 2 === 0 ? 'white' : '#fafafa', borderBottom: '1px solid #f3f4f6' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#fff5f5'}
+                  onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#fafafa'}
+                >
+                  <span style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', letterSpacing: 1 }}>{c.code}</span>
+                  <span style={{ fontWeight: 800, fontSize: 15, color: '#e8002d' }}>{c.pct}%</span>
+                  <div>
+                    <div onClick={() => toggleCodeActive(c.code, c.active)} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: c.active ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', display: 'inline-block' }}>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: c.active ? 3 : 23, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {confirmDeleteCode === c.code ? (
+                      <>
+                        <button onClick={() => handleDeleteCode(c.code)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
+                        <button onClick={() => setConfirmDeleteCode(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>إلغاء</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => { setEditingCode(c.code); setCodeForm({ code: c.code, pct: c.pct, active: c.active }); setCodeErrors({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: '#003478', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#003478'; e.currentTarget.style.color = 'white'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = '#003478'; }}
+                        >✏️</button>
+                        <button onClick={() => setConfirmDeleteCode(c.code)}
+                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: '#fff5f5', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; e.currentTarget.style.color = '#e8002d'; }}
+                        >🗑️</button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div style={{ padding: '10px 20px', fontSize: 13, color: '#9ca3af', textAlign: 'center' }}>
+                {promoCodes.length} كود — {promoCodes.filter(c => c.active).length} فعّال
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
