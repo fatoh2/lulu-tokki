@@ -49,6 +49,7 @@ export default function ProductDetail() {
   const { t, lang, isRTL } = useLanguage();
   const [activePhoto, setActivePhoto] = useState(0);
   const [qty, setQty] = useState(1);
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
 
   const product = products.find(p => p.id === Number(id));
 
@@ -71,16 +72,22 @@ export default function ProductDetail() {
   const inCart = items.find(i => i.id === product.id);
   const outOfStock = !product.inStock || product.stock === 0;
   const lowStock = product.inStock && product.stock != null && product.stock > 0 && product.stock <= 5;
+  const variants = product.variants ?? [];
+  const activeVariant = variants.length > 0 ? variants[selectedVariantIdx] : null;
+  const displayPrice = activeVariant
+    ? +(product.price * activeVariant.multiplier * (1 - (activeVariant.discountPct ?? 0) / 100)).toFixed(2)
+    : product.price;
 
   const handleAddToCart = () => {
     if (inCart) {
       updateQty(product.id, inCart.quantity + qty);
     } else {
-      for (let i = 0; i < qty; i++) addItem(product);
+      for (let i = 0; i < qty; i++) addItem(product, activeVariant);
     }
+    const label = activeVariant ? ` (${activeVariant.label})` : '';
     const msg = lang === 'ar'
-      ? `تمت إضافة ${qty} إلى السلة! ${product.emoji}`
-      : `Added ${qty} to cart! ${product.emoji}`;
+      ? `تمت إضافة ${qty} إلى السلة! ${product.emoji}${label}`
+      : `Added ${qty} to cart! ${product.emoji}${label}`;
     toast.success(msg, {
       style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr', fontWeight: 600 },
       iconTheme: { primary: '#e8002d', secondary: '#fff' },
@@ -194,14 +201,47 @@ export default function ProductDetail() {
           )}
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-            <span style={{ fontWeight: 900, fontSize: 36, color: '#e8002d' }}>{product.price.toFixed(2)}</span>
+            <span style={{ fontWeight: 900, fontSize: 36, color: '#e8002d' }}>{displayPrice.toFixed(2)}</span>
             <span style={{ fontWeight: 700, fontSize: 16, color: '#6b7280' }}>{t('currency')}</span>
+            {activeVariant && activeVariant.discountPct > 0 && (
+              <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through', marginInlineStart: 4 }}>
+                {(product.price * activeVariant.multiplier).toFixed(2)}
+              </span>
+            )}
             {inCart && (
               <span style={{ marginInlineStart: 8, fontSize: 13, color: '#003478', fontWeight: 700, background: '#eff6ff', padding: '3px 10px', borderRadius: 6 }}>
                 {inCartBadge}
               </span>
             )}
           </div>
+
+          {/* Variant selector */}
+          {variants.length > 0 && (
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 10 }}>
+                {lang === 'ar' ? 'اختر الحجم:' : 'Choose size:'}
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {variants.map((v, i) => {
+                  const vPrice = +(product.price * v.multiplier * (1 - (v.discountPct ?? 0) / 100)).toFixed(2);
+                  const isActive = selectedVariantIdx === i;
+                  return (
+                    <button key={v.label} onClick={() => setSelectedVariantIdx(i)} style={{
+                      padding: '10px 18px', borderRadius: 12, border: `2px solid ${isActive ? '#e8002d' : '#e5e7eb'}`,
+                      background: isActive ? '#fff0f2' : 'white', cursor: 'pointer', textAlign: 'center',
+                      fontFamily: 'Cairo, sans-serif', transition: 'all 0.15s', minWidth: 80,
+                    }}>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: isActive ? '#e8002d' : '#1a1a2e' }}>{v.label}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: isActive ? '#e8002d' : '#6b7280', marginTop: 2 }}>{vPrice.toFixed(2)} {t('currency')}</div>
+                      {v.discountPct > 0 && (
+                        <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, marginTop: 2 }}>-{v.discountPct}%</div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <p style={{ color: '#374151', fontSize: 15, lineHeight: 1.8, margin: 0 }}>{product.longDescription}</p>
 
@@ -230,7 +270,7 @@ export default function ProductDetail() {
                 <span style={{ fontWeight: 800, fontSize: 18, minWidth: 40, textAlign: 'center', color: '#1a1a2e' }}>{qty}</span>
                 <button onClick={() => setQty(q => q + 1)} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#e8002d', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>+</button>
               </div>
-              <span style={{ fontSize: 14, color: '#9ca3af', fontWeight: 600 }}>= {(product.price * qty).toFixed(2)} {t('currency')}</span>
+              <span style={{ fontSize: 14, color: '#9ca3af', fontWeight: 600 }}>= {(displayPrice * qty).toFixed(2)} {t('currency')}</span>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button

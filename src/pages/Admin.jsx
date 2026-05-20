@@ -8,7 +8,7 @@ const CATEGORIES = ['رامن', 'رقائق', 'حلوى', 'مشروبات', 'ب�
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'رامن',
   emoji: '🍜', brand: '', weight: '', servings: '',
-  heat: 0, inStock: true, stock: '', tags: '',
+  heat: 0, inStock: true, stock: '', tags: '', variants: [],
 };
 
 function Badge({ children, color = '#e8002d', bg = '#fff0f2' }) {
@@ -78,6 +78,7 @@ export default function Admin() {
       inStock: p.inStock ?? true,
       stock: p.stock != null ? String(p.stock) : '',
       tags: (p.tags ?? []).join(', '),
+      variants: p.variants ?? [],
     });
     setImagePreview(p.imageUrl ?? '');
     setImageFile(null);
@@ -475,6 +476,41 @@ export default function Admin() {
                     onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                   />
                 </Field>
+              </div>
+
+              {/* Variants */}
+              <div style={{ gridColumn: '1 / -1' }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 8 }}>
+                  أحجام العبوات (اختياري) — مثال: 1x، 3x، 6x
+                </div>
+                {form.variants.map((v, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                    <input
+                      value={v.label} placeholder="الحجم (1x)"
+                      onChange={e => { const vs = [...form.variants]; vs[i] = { ...vs[i], label: e.target.value }; set('variants', vs); }}
+                      style={{ ...inputStyle(false), width: 80, flexShrink: 0 }}
+                    />
+                    <input
+                      type="number" min="1" value={v.multiplier} placeholder="الكمية"
+                      onChange={e => { const vs = [...form.variants]; vs[i] = { ...vs[i], multiplier: Number(e.target.value) }; set('variants', vs); }}
+                      style={{ ...inputStyle(false), width: 90, flexShrink: 0 }}
+                    />
+                    <input
+                      type="number" min="0" max="100" value={v.discountPct ?? ''} placeholder="خصم %"
+                      onChange={e => { const vs = [...form.variants]; vs[i] = { ...vs[i], discountPct: e.target.value === '' ? 0 : Number(e.target.value) }; set('variants', vs); }}
+                      style={{ ...inputStyle(false), width: 90, flexShrink: 0 }}
+                    />
+                    <button type="button" onClick={() => set('variants', form.variants.filter((_, j) => j !== i))}
+                      style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #fee2e2', background: '#fff5f5', color: '#e8002d', cursor: 'pointer', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button type="button"
+                  onClick={() => set('variants', [...form.variants, { label: `${(form.variants.length + 1)}x`, multiplier: form.variants.length + 1, discountPct: 0 }])}
+                  style={{ padding: '7px 16px', borderRadius: 8, border: '2px dashed #e5e7eb', background: 'white', color: '#6b7280', cursor: 'pointer', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13 }}>
+                  + إضافة حجم
+                </button>
               </div>
 
               {/* Toggles */}

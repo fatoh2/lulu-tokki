@@ -59,7 +59,10 @@ export default function Cart() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', marginBottom: 4, lineHeight: 1.3 }}>{item.name}</div>
-                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>{item.brand} • {item.category}</div>
+                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+                  {item.brand} • {item.category}
+                  {item.variant && <span style={{ marginInlineStart: 6, background: '#eff6ff', color: '#003478', fontWeight: 700, padding: '1px 7px', borderRadius: 5 }}>{item.variant.label}</span>}
+                </div>
                 <div style={{ fontWeight: 800, fontSize: 16, color: '#e8002d' }}>
                   {(item.price * item.quantity).toFixed(2)} {t('currency')}
                   <span style={{ fontWeight: 500, fontSize: 12, color: '#9ca3af', marginInlineStart: 6 }}>

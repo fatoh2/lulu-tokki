@@ -5,15 +5,19 @@ const CartContext = createContext(null);
 function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existing = state.find(i => i.id === action.product.id);
+      const { product, variant } = action;
+      const price = variant
+        ? +(product.price * variant.multiplier * (1 - (variant.discountPct ?? 0) / 100)).toFixed(2)
+        : product.price;
+      const existing = state.find(i => i.id === product.id);
       if (existing) {
         return state.map(i =>
-          i.id === action.product.id
-            ? { ...i, quantity: i.quantity + 1 }
+          i.id === product.id
+            ? { ...i, price, variant: variant ?? null, quantity: i.quantity + 1 }
             : i
         );
       }
-      return [...state, { ...action.product, quantity: 1 }];
+      return [...state, { ...product, price, variant: variant ?? null, quantity: 1 }];
     }
     case 'REMOVE_ITEM':
       return state.filter(i => i.id !== action.id);
@@ -45,7 +49,7 @@ export function CartProvider({ children }) {
     localStorage.setItem('hanook-cart', JSON.stringify(items));
   }, [items]);
 
-  const addItem = (product) => dispatch({ type: 'ADD_ITEM', product });
+  const addItem = (product, variant = null) => dispatch({ type: 'ADD_ITEM', product, variant });
   const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id });
   const updateQty = (id, qty) => dispatch({ type: 'UPDATE_QTY', id, qty });
   const clearCart = () => dispatch({ type: 'CLEAR' });
