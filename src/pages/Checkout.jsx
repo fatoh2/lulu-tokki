@@ -73,7 +73,7 @@ export default function Checkout() {
           '🛒 طلب جديد - هانوك سناكس',
           sep,
           `👤 الاسم: ${form.name}`,
-          `📱 الجوال: ${form.phone}`,
+          `📱 التلفون: ${form.phone}`,
           `📍 العنوان: ${addressParts}`,
           form.notes.trim() ? `📝 ملاحظات: ${form.notes}` : '',
           sep,
