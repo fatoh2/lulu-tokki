@@ -53,6 +53,7 @@ export default function Navbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {!isMobile && (
             <>
+              <Link to="/" style={navLinkStyle('/')}>{t('footerHome')}</Link>
               <Link to="/store" style={navLinkStyle('/store')}>{t('navStore')}</Link>
               <Link
                 to="/admin"
@@ -140,6 +141,12 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {isMobile && menuOpen && (
         <div style={{ background: 'white', borderTop: '1px solid #f3f4f6', borderBottom: '2px solid #e8002d', padding: '12px 20px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+          <Link
+            to="/"
+            style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}
+          >
+            {t('footerHome')}
+          </Link>
           <Link
             to="/store"
             style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/store') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}
