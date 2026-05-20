@@ -183,6 +183,13 @@ const T = {
     orderSentWhatsapp: 'تم الإرسال عبر واتساب',
     addToWishlist: 'أضف للمفضلة',
     removeFromWishlist: 'إزالة من المفضلة',
+
+    promoCodeLabel: 'كود الخصم',
+    promoPlaceholder: 'أدخل الكود...',
+    applyPromoBtn: 'تطبيق',
+    promoInvalid: 'الكود غير صحيح أو منتهي الصلاحية',
+    discountLabel: 'خصم',
+    removePromoBtn: 'إزالة',
   },
 
   en: {
@@ -367,6 +374,13 @@ const T = {
     orderSentWhatsapp: 'Sent via WhatsApp',
     addToWishlist: 'Add to Wishlist',
     removeFromWishlist: 'Remove from Wishlist',
+
+    promoCodeLabel: 'Promo Code',
+    promoPlaceholder: 'Enter code...',
+    applyPromoBtn: 'Apply',
+    promoInvalid: 'Invalid or expired code',
+    discountLabel: 'Discount',
+    removePromoBtn: 'Remove',
   },
 };
 

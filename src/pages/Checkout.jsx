@@ -29,6 +29,13 @@ function Field({ label, required, error, children }) {
   );
 }
 
+const PROMO_CODES = {
+  HANOOK10: { pct: 10 },
+  HANOOK20: { pct: 20 },
+  WELCOME:  { pct: 15 },
+  KOREA:    { pct: 5  },
+};
+
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
@@ -37,9 +44,30 @@ export default function Checkout() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', city: '', district: '', street: '', building: '', notes: '' });
   const [errors, setErrors] = useState({});
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null); // { code, pct }
+  const [promoError, setPromoError] = useState('');
 
   const shipping = totalPrice >= 100 ? 0 : 15;
-  const total = totalPrice + shipping;
+  const discountAmt = appliedPromo ? +(totalPrice * appliedPromo.pct / 100).toFixed(2) : 0;
+  const total = totalPrice - discountAmt + shipping;
+
+  const applyPromo = () => {
+    const code = promoInput.trim().toUpperCase();
+    if (PROMO_CODES[code]) {
+      setAppliedPromo({ code, pct: PROMO_CODES[code].pct });
+      setPromoError('');
+      setPromoInput('');
+    } else {
+      setPromoError(t('promoInvalid'));
+    }
+  };
+
+  const removePromo = () => {
+    setAppliedPromo(null);
+    setPromoError('');
+    setPromoInput('');
+  };
 
   const update = (field, val) => {
     setForm(f => ({ ...f, [field]: val }));
@@ -85,6 +113,7 @@ export default function Checkout() {
           itemLines,
           sep,
           `💰 المجموع الفرعي: ₪${totalPrice.toFixed(2)}`,
+          appliedPromo ? `🎟️ كود الخصم (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
           `🚚 الشحن: ${shippingText}`,
           `✅ الإجمالي: ₪${total.toFixed(2)}`,
         ].filter(line => line !== '').join('\n')
@@ -100,6 +129,7 @@ export default function Checkout() {
           itemLines,
           sep,
           `💰 Subtotal: ₪${totalPrice.toFixed(2)}`,
+          appliedPromo ? `🎟️ Promo (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
           `🚚 Shipping: ${shippingText}`,
           `✅ Total: ₪${total.toFixed(2)}`,
         ].filter(line => line !== '').join('\n');
@@ -247,11 +277,48 @@ export default function Checkout() {
                   </div>
                 ))}
               </div>
+              {/* Promo code */}
+              <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 14, marginBottom: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 8 }}>{t('promoCodeLabel')}</div>
+                {appliedPromo ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 10, padding: '8px 12px' }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#16a34a' }}>
+                      🎟️ {appliedPromo.code} — {appliedPromo.pct}% {lang === 'ar' ? 'خصم' : 'off'}
+                    </span>
+                    <button type="button" onClick={removePromo} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', padding: '2px 6px' }}>
+                      {t('removePromoBtn')}
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input
+                      value={promoInput}
+                      onChange={e => { setPromoInput(e.target.value); setPromoError(''); }}
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyPromo())}
+                      placeholder={t('promoPlaceholder')}
+                      style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: `2px solid ${promoError ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 13, color: '#1a1a2e', outline: 'none', background: 'white' }}
+                      onFocus={e => { if (!promoError) e.target.style.borderColor = '#e8002d'; }}
+                      onBlur={e => { if (!promoError) e.target.style.borderColor = '#e5e7eb'; }}
+                    />
+                    <button type="button" onClick={applyPromo} style={{ padding: '9px 14px', borderRadius: 9, border: 'none', background: '#1a1a2e', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer', flexShrink: 0 }}>
+                      {t('applyPromoBtn')}
+                    </button>
+                  </div>
+                )}
+                {promoError && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 5, fontWeight: 600 }}>⚠ {promoError}</div>}
+              </div>
+
               <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#6b7280' }}>
                   <span>{t('subtotal')}</span>
                   <span style={{ fontWeight: 700, color: '#1a1a2e' }}>{totalPrice.toFixed(2)} {t('currency')}</span>
                 </div>
+                {discountAmt > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#16a34a' }}>
+                    <span style={{ fontWeight: 600 }}>{t('discountLabel')} ({appliedPromo.pct}%)</span>
+                    <span style={{ fontWeight: 700 }}>-{discountAmt.toFixed(2)} {t('currency')}</span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#6b7280' }}>
                   <span>{t('shippingLabel')}</span>
                   <span style={{ fontWeight: 700, color: shipping === 0 ? '#16a34a' : '#1a1a2e' }}>
