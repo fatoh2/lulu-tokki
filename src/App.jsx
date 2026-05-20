@@ -30,24 +30,35 @@ function BackToTop() {
     >↑</button>
   );
 }
+
 import { Toaster } from 'react-hot-toast';
 import { CartProvider } from './context/CartContext';
 import { ProductsProvider } from './context/ProductsContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import InstallBanner from './components/InstallBanner';
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import ProductDetail from './pages/ProductDetail';
+import Category from './pages/Category';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Account from './pages/Account';
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 
 function AdminRoute({ children }) {
   const { user } = useAuth();
@@ -68,10 +79,11 @@ function AppInner() {
       <BackToTop />
       <Toaster position="bottom-center" />
       <Navbar />
-      <main style={{ flex: 1, background: '#f8f9fb' }}>
+      <main style={{ flex: 1, background: 'var(--bg)' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/store" element={<Catalog />} />
+          <Route path="/category/:category" element={<Category />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -82,6 +94,7 @@ function AppInner() {
         </Routes>
       </main>
       <Footer />
+      <InstallBanner />
     </>
   );
 }
@@ -89,17 +102,19 @@ function AppInner() {
 export default function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <WishlistProvider>
-            <ProductsProvider>
-              <CartProvider>
-                <AppInner />
-              </CartProvider>
-            </ProductsProvider>
-          </WishlistProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <WishlistProvider>
+              <ProductsProvider>
+                <CartProvider>
+                  <AppInner />
+                </CartProvider>
+              </ProductsProvider>
+            </WishlistProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

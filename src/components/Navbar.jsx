@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -18,6 +19,7 @@ export default function Navbar() {
   const { totalItems } = useCart();
   const { t, toggleLang, lang } = useLanguage();
   const { user, logout } = useAuth();
+  const { dark, toggle: toggleDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -33,15 +35,20 @@ export default function Navbar() {
     borderRadius: 8,
     fontWeight: 600,
     fontSize: 15,
-    color: isActive(path) ? '#e8002d' : '#374151',
+    color: isActive(path) ? '#e8002d' : 'var(--subtext)',
     background: isActive(path) ? '#fff0f2' : 'transparent',
-    transition: 'all 0.2s',
   });
+
+  const iconBtnStyle = {
+    padding: '6px 12px', borderRadius: 8, border: '2px solid var(--border)',
+    background: 'var(--card)', color: 'var(--subtext)',
+    fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+  };
 
   const firstName = user?.name?.split(' ')[0] || '';
 
   return (
-    <nav style={{ background: 'white', borderBottom: '2px solid #e8002d', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
+    <nav style={{ background: 'var(--nav-bg)', borderBottom: '2px solid #e8002d', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-md)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: lang === 'ar' ? 'row' : 'row-reverse' }}>
 
         {/* Logo */}
@@ -49,7 +56,7 @@ export default function Navbar() {
           <span style={{ fontSize: 28 }}>🇰🇷</span>
           <div>
             <div style={{ fontWeight: 800, fontSize: 18, color: '#e8002d', lineHeight: 1.1 }}>{t('storeName')}</div>
-            <div style={{ fontSize: 11, color: '#6b7280', lineHeight: 1 }}>Korean Snacks Store</div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1 }}>Korean Snacks Store</div>
           </div>
         </Link>
 
@@ -59,7 +66,6 @@ export default function Navbar() {
               <Link to="/" style={navLinkStyle('/')}>{t('footerHome')}</Link>
               <Link to="/store" style={navLinkStyle('/store')}>{t('navStore')}</Link>
 
-              {/* User account link */}
               {user ? (
                 <>
                   <Link to="/account" style={{ ...navLinkStyle('/account'), display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -70,9 +76,9 @@ export default function Navbar() {
                   </Link>
                   <button
                     onClick={() => { logout(); navigate('/'); }}
-                    style={{ padding: '8px 14px', borderRadius: 8, border: '2px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 600, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s' }}
+                    style={iconBtnStyle}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.color = '#e8002d'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#6b7280'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
                   >
                     {t('signOut')}
                   </button>
@@ -89,12 +95,23 @@ export default function Navbar() {
             </>
           )}
 
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggleDark}
+            title={dark ? 'Light mode' : 'Dark mode'}
+            style={{ ...iconBtnStyle, fontSize: 16, padding: '6px 10px' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+          >
+            {dark ? '☀️' : '🌙'}
+          </button>
+
           {/* Lang toggle */}
           <button
             onClick={toggleLang}
-            style={{ padding: '6px 12px', borderRadius: 8, border: '2px solid #e5e7eb', background: 'white', color: '#374151', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s' }}
+            style={iconBtnStyle}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.color = '#e8002d'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#374151'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
           >
             {t('langToggle')}
           </button>
@@ -102,7 +119,7 @@ export default function Navbar() {
           {/* Cart */}
           <Link
             to="/cart"
-            style={{ textDecoration: 'none', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 10, color: isActive('/cart') ? 'white' : '#e8002d', background: isActive('/cart') ? '#e8002d' : '#fff0f2', border: '2px solid #e8002d', transition: 'all 0.2s', fontSize: 20 }}
+            style={{ textDecoration: 'none', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 10, color: isActive('/cart') ? 'white' : '#e8002d', background: isActive('/cart') ? '#e8002d' : '#fff0f2', border: '2px solid #e8002d', fontSize: 20 }}
           >
             🛒
             {totalItems > 0 && (
@@ -119,9 +136,9 @@ export default function Navbar() {
               style={{ background: 'none', border: 'none', padding: '6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center', justifyContent: 'center' }}
               aria-label="Menu"
             >
-              <div style={{ width: 22, height: 2, background: '#374151', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(45deg) translateY(7px)' : 'none' }} />
-              <div style={{ width: 22, height: 2, background: '#374151', borderRadius: 2, transition: 'opacity 0.25s', opacity: menuOpen ? 0 : 1 }} />
-              <div style={{ width: 22, height: 2, background: '#374151', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none' }} />
+              <div style={{ width: 22, height: 2, background: 'var(--subtext)', borderRadius: 2, transform: menuOpen ? 'rotate(45deg) translateY(7px)' : 'none' }} />
+              <div style={{ width: 22, height: 2, background: 'var(--subtext)', borderRadius: 2, opacity: menuOpen ? 0 : 1 }} />
+              <div style={{ width: 22, height: 2, background: 'var(--subtext)', borderRadius: 2, transform: menuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none' }} />
             </button>
           )}
         </div>
@@ -129,32 +146,38 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {isMobile && menuOpen && (
-        <div style={{ background: 'white', borderTop: '1px solid #f3f4f6', borderBottom: '2px solid #e8002d', padding: '12px 20px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
-          <Link to="/" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{ background: 'var(--nav-bg)', borderTop: '1px solid var(--border)', borderBottom: '2px solid #e8002d', padding: '12px 20px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+          <Link to="/" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
             {t('footerHome')}
           </Link>
-          <Link to="/store" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/store') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}>
+          <Link to="/store" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/store') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
             {t('navStore')}
           </Link>
           {user ? (
             <>
-              <Link to="/account" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/account') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}>
+              <Link to="/account" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/account') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 👤 {user.name}
               </Link>
-              <button onClick={() => { logout(); navigate('/'); }} style={{ display: 'block', width: '100%', textAlign: 'start', padding: '12px 0', fontWeight: 700, fontSize: 16, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif' }}>
+              <button onClick={() => { logout(); navigate('/'); }} style={{ display: 'block', width: '100%', textAlign: 'start', padding: '12px 0', fontWeight: 700, fontSize: 16, color: 'var(--subtext)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif' }}>
                 {t('signOut')}
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/login') ? '#e8002d' : '#374151', textDecoration: 'none', borderBottom: '1px solid #f3f4f6' }}>
+              <Link to="/login" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/login') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 {t('signIn')}
               </Link>
-              <Link to="/signup" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/signup') ? '#e8002d' : '#374151', textDecoration: 'none' }}>
+              <Link to="/signup" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/signup') ? '#e8002d' : 'var(--text)', textDecoration: 'none' }}>
                 {t('signUp')}
               </Link>
             </>
           )}
+          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+            <button onClick={toggleDark} style={{ ...iconBtnStyle, fontSize: 16 }}>
+              {dark ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <button onClick={toggleLang} style={iconBtnStyle}>{t('langToggle')}</button>
+          </div>
         </div>
       )}
     </nav>

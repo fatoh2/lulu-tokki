@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
@@ -101,7 +101,7 @@ export default function Home() {
       </div>
 
       {/* ── Features ── */}
-      <div style={{ background: 'white', padding: '52px 20px', borderBottom: '1px solid #f0f0f0' }}>
+      <div style={{ background: 'var(--card)', padding: '52px 20px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
           {FEATURES.map(f => (
             <div
@@ -124,7 +124,7 @@ export default function Home() {
           <div style={{ fontSize: 13, color: '#e8002d', fontWeight: 700, letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' }}>
             🔥 {t('mostBoughtSubtitle')}
           </div>
-          <h2 style={{ fontWeight: 900, fontSize: 30, color: '#1a1a2e', margin: 0 }}>
+          <h2 style={{ fontWeight: 900, fontSize: 30, color: 'var(--text)', margin: 0 }}>
             {t('mostBoughtTitle')}
           </h2>
         </div>
@@ -144,24 +144,24 @@ export default function Home() {
       </div>
 
       {/* ── Categories ── */}
-      <div style={{ background: '#f8f9fb', padding: '64px 20px' }}>
+      <div style={{ background: 'var(--muted-bg)', padding: '64px 20px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontWeight: 900, fontSize: 28, color: '#1a1a2e', marginTop: 0, marginBottom: 40 }}>
+          <h2 style={{ textAlign: 'center', fontWeight: 900, fontSize: 28, color: 'var(--text)', marginTop: 0, marginBottom: 40 }}>
             {t('categoriesTitle')}
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
             {CATEGORIES.map(cat => (
-              <button
+              <Link
                 key={cat.key}
-                onClick={() => navigate('/store', { state: { category: cat.key } })}
-                style={{ background: 'white', border: '2px solid #f0f0f0', borderRadius: 20, padding: '28px 12px', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', fontFamily: 'Cairo, sans-serif' }}
+                to={`/category/${encodeURIComponent(cat.key)}`}
+                style={{ background: 'var(--card)', border: '2px solid var(--card-border)', borderRadius: 20, padding: '28px 12px', textAlign: 'center', fontFamily: 'Cairo, sans-serif', textDecoration: 'none', display: 'block' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(232,0,45,0.12)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#f0f0f0'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <div style={{ fontSize: 46, marginBottom: 10, lineHeight: 1 }}>{cat.emoji}</div>
-                <div style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', marginBottom: 4 }}>{t(cat.tKey)}</div>
-                <div style={{ fontSize: 12, color: '#9ca3af' }}>{catCount(cat.key)} {t('catItems')}</div>
-              </button>
+                <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>{t(cat.tKey)}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>{catCount(cat.key)} {t('catItems')}</div>
+              </Link>
             ))}
           </div>
         </div>

@@ -7,6 +7,14 @@ import toast from 'react-hot-toast';
 
 const CATEGORIES = ['رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت'];
 
+const ORDER_STATUS = {
+  pending:   { label: 'قيد الانتظار', bg: '#fff7ed', color: '#c2410c', icon: '⏳', next: 'confirmed' },
+  confirmed: { label: 'تم التأكيد',   bg: '#eff6ff', color: '#1d4ed8', icon: '✅', next: 'shipped' },
+  shipped:   { label: 'تم الشحن',     bg: '#faf5ff', color: '#7e22ce', icon: '🚚', next: 'delivered' },
+  delivered: { label: 'تم التوصيل',   bg: '#f0fdf4', color: '#16a34a', icon: '📦', next: null },
+  cancelled: { label: 'ملغي',          bg: '#f3f4f6', color: '#6b7280', icon: '❌', next: null },
+};
+
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'رامن',
   emoji: '🍜', brand: '', weight: '', servings: '',
@@ -56,10 +64,14 @@ export default function Admin() {
   const [editingCode, setEditingCode] = useState(null);
   const [confirmDeleteCode, setConfirmDeleteCode] = useState(null);
 
-  // ── Analytics orders state ──
+  // ── Orders / Analytics shared state ──
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersLoaded, setOrdersLoaded] = useState(false);
+
+  // ── Order management state ──
+  const [orderFilter, setOrderFilter] = useState('all');
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     setCodesLoading(true);
@@ -146,6 +158,11 @@ export default function Admin() {
     } finally {
       setOrdersLoading(false);
     }
+  };
+
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
   };
 
   const handleImageSelect = (e) => {
@@ -263,6 +280,11 @@ export default function Admin() {
     });
   };
 
+  // ── Order management computations ──
+  const orderCounts = { all: orders.length };
+  Object.keys(ORDER_STATUS).forEach(s => { orderCounts[s] = orders.filter(o => (o.status || 'pending') === s).length; });
+  const visibleOrders = orderFilter === 'all' ? orders : orders.filter(o => (o.status || 'pending') === orderFilter);
+
   // ── Analytics computations ──
   const aRevenue = orders.reduce((s, o) => s + (o.total || 0), 0);
   const aAvg = orders.length ? aRevenue / orders.length : 0;
@@ -325,8 +347,8 @@ export default function Admin() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'white', borderRadius: 12, padding: 4, border: '1px solid #e5e7eb', width: 'fit-content' }}>
-        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم'], ['analytics', '📊 الإحصاءات']].map(([key, label]) => (
-          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } if (key === 'analytics') { loadOrders(); } }} style={{
+        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم'], ['orders', '🗂️ الطلبات'], ['analytics', '📊 الإحصاءات']].map(([key, label]) => (
+          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } if (key === 'analytics' || key === 'orders') { loadOrders(); } }} style={{
             padding: '8px 24px', borderRadius: 9, border: 'none',
             background: tab === key ? '#e8002d' : 'transparent',
             color: tab === key ? 'white' : '#6b7280',
@@ -795,6 +817,91 @@ export default function Admin() {
                 {promoCodes.length} كود — {promoCodes.filter(c => c.active).length} فعّال
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Orders Management Tab ── */}
+      {tab === 'orders' && (
+        <div>
+          {ordersLoading && <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 15 }}>⏳ جاري تحميل الطلبات...</div>}
+          {!ordersLoading && ordersLoaded && (
+            <>
+              {/* Status filter pills */}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+                {[['all', 'الكل'], ...Object.keys(ORDER_STATUS).map(s => [s, ORDER_STATUS[s].label])].map(([key, label]) => (
+                  <button key={key} onClick={() => setOrderFilter(key)} style={{
+                    padding: '6px 16px', borderRadius: 20, border: '2px solid',
+                    borderColor: orderFilter === key ? '#e8002d' : '#e5e7eb',
+                    background: orderFilter === key ? '#e8002d' : 'white',
+                    color: orderFilter === key ? 'white' : '#374151',
+                    fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                  }}>
+                    {label}{orderCounts[key] > 0 ? ` (${orderCounts[key]})` : ''}
+                  </button>
+                ))}
+              </div>
+
+              {visibleOrders.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 14 }}>لا توجد طلبات في هذه الفئة</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {visibleOrders.map(order => {
+                    const status = order.status || 'pending';
+                    const sc = ORDER_STATUS[status] || ORDER_STATUS.pending;
+                    const isExpanded = expandedOrder === order.id;
+                    return (
+                      <div key={order.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                        {/* Header row */}
+                        <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', cursor: 'pointer' }} onClick={() => setExpandedOrder(isExpanded ? null : order.id)}>
+                          <span style={{ background: sc.bg, color: sc.color, fontWeight: 700, fontSize: 12, padding: '4px 10px', borderRadius: 8, flexShrink: 0 }}>{sc.icon} {sc.label}</span>
+                          <div style={{ flex: 1, minWidth: 160 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{order.customerName || 'زبون'}</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af', direction: 'ltr' }}>{order.phone} • {new Date(order.date).toLocaleDateString('ar-IL', { month: 'short', day: 'numeric' })}</div>
+                          </div>
+                          {order.address?.city && <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>📍 {order.address.city}</div>}
+                          <div style={{ fontWeight: 800, fontSize: 15, color: '#e8002d', flexShrink: 0 }}>{(order.total || 0).toFixed(2)} ₪</div>
+                          <span style={{ fontSize: 16, color: '#9ca3af' }}>{isExpanded ? '▲' : '▼'}</span>
+                        </div>
+
+                        {/* Expanded details */}
+                        {isExpanded && (
+                          <div style={{ borderTop: '1px solid #f3f4f6', padding: '14px 18px' }}>
+                            {(order.items || []).map((item, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: i < (order.items.length - 1) ? '1px solid #f9fafb' : 'none' }}>
+                                <span style={{ fontSize: 20 }}>{item.emoji || '🛍️'}</span>
+                                <span style={{ flex: 1, fontSize: 13, color: '#374151', fontWeight: 600 }}>{item.name}</span>
+                                {item.variant && <span style={{ fontSize: 11, color: '#6b7280', background: '#f3f4f6', padding: '1px 7px', borderRadius: 5 }}>{item.variant}</span>}
+                                <span style={{ fontSize: 12, color: '#9ca3af' }}>× {item.quantity}</span>
+                                <span style={{ fontWeight: 700, fontSize: 13, color: '#1a1a2e' }}>{((item.price || 0) * item.quantity).toFixed(2)} ₪</span>
+                              </div>
+                            ))}
+                            <div style={{ display: 'flex', gap: 20, fontSize: 13, color: '#6b7280', margin: '12px 0', flexWrap: 'wrap' }}>
+                              <span>مجموع: <b style={{ color: '#1a1a2e' }}>{(order.subtotal || 0).toFixed(2)} ₪</b></span>
+                              {(order.discount || 0) > 0 && <span>خصم: <b style={{ color: '#16a34a' }}>-{order.discount.toFixed(2)} ₪</b></span>}
+                              <span>شحن: <b style={{ color: '#1a1a2e' }}>{(order.shipping || 0) === 0 ? 'مجاني 🎉' : `${(order.shipping || 0).toFixed(2)} ₪`}</b></span>
+                              {order.notes && <span>ملاحظات: <b style={{ color: '#374151' }}>{order.notes}</b></span>}
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                              {sc.next && (
+                                <button onClick={() => handleUpdateStatus(order.id, sc.next)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                  {ORDER_STATUS[sc.next].icon} تحديث إلى: {ORDER_STATUS[sc.next].label}
+                                </button>
+                              )}
+                              {status !== 'cancelled' && status !== 'delivered' && (
+                                <button onClick={() => handleUpdateStatus(order.id, 'cancelled')} style={{ padding: '7px 18px', borderRadius: 8, border: '2px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                  ❌ إلغاء
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

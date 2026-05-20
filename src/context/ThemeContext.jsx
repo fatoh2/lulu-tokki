@@ -1,0 +1,24 @@
+import { createContext, useContext, useState, useEffect } from 'react';
+
+const ThemeContext = createContext(null);
+
+export function ThemeProvider({ children }) {
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem('hanook-theme') === 'dark'; } catch { return false; }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    try { localStorage.setItem('hanook-theme', dark ? 'dark' : 'light'); } catch {}
+  }, [dark]);
+
+  const toggle = () => setDark(d => !d);
+
+  return (
+    <ThemeContext.Provider value={{ dark, toggle }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export const useTheme = () => useContext(ThemeContext);

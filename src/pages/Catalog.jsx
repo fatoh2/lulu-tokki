@@ -115,9 +115,9 @@ export default function Catalog() {
           placeholder={t('searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: '100%', padding: isRTL ? '14px 50px 14px 20px' : '14px 20px 14px 50px', borderRadius: 12, border: '2px solid #e5e7eb', fontSize: 15, fontFamily: 'Cairo, sans-serif', outline: 'none', transition: 'border-color 0.2s', boxSizing: 'border-box' }}
+          style={{ width: '100%', padding: isRTL ? '14px 50px 14px 20px' : '14px 20px 14px 50px', borderRadius: 12, border: '2px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15, fontFamily: 'Cairo, sans-serif', outline: 'none', boxSizing: 'border-box' }}
           onFocus={e => e.target.style.borderColor = '#e8002d'}
-          onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+          onBlur={e => e.target.style.borderColor = 'var(--border)'}
         />
         {search && (
           <button onClick={() => setSearch('')} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 16, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' }}>×</button>
@@ -129,20 +129,20 @@ export default function Catalog() {
         {CATEGORIES.map(cat => (
           <button key={cat} onClick={() => setCategory(cat)} style={{
             padding: '8px 18px', borderRadius: 24, border: '2px solid',
-            borderColor: category === cat ? '#e8002d' : '#e5e7eb',
-            background: category === cat ? '#e8002d' : 'white',
-            color: category === cat ? 'white' : '#374151',
-            fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.2s',
+            borderColor: category === cat ? '#e8002d' : 'var(--border)',
+            background: category === cat ? '#e8002d' : 'var(--card)',
+            color: category === cat ? 'white' : 'var(--text)',
+            fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer',
           }}>{catLabel(cat)}</button>
         ))}
       </div>
 
       {/* Toolbar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ color: '#6b7280', fontSize: 14, fontWeight: 600 }}>
+        <div style={{ color: 'var(--subtext)', fontSize: 14, fontWeight: 600 }}>
           {filtered.length === 0 ? t('noResultsTitle') : (
             <>
-              <span style={{ color: '#1a1a2e', fontWeight: 800 }}>{filtered.length}</span> {t('productsLabel')}
+              <span style={{ color: 'var(--text)', fontWeight: 800 }}>{filtered.length}</span> {t('productsLabel')}
               {totalPages > 1 && (
                 <span style={{ [isRTL ? 'marginRight' : 'marginLeft']: 8, color: '#9ca3af' }}>
                   — {t('pageLabel')} {page} {t('ofLabel')} {totalPages}
@@ -169,7 +169,7 @@ export default function Catalog() {
               </span>
             )}
           </button>
-          <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '8px 16px', borderRadius: 10, border: '2px solid #e5e7eb', fontFamily: 'Cairo, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', background: 'white', color: '#374151', outline: 'none' }}>
+          <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '8px 16px', borderRadius: 10, border: '2px solid var(--border)', fontFamily: 'Cairo, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', background: 'var(--card)', color: 'var(--text)', outline: 'none' }}>
             {sortOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
@@ -177,10 +177,10 @@ export default function Catalog() {
 
       {/* Filter Panel */}
       {filtersOpen && (
-        <div style={{ background: 'white', borderRadius: 16, padding: 24, marginBottom: 24, border: '2px solid #e8002d', boxShadow: '0 4px 20px rgba(232,0,45,0.1)' }}>
+        <div style={{ background: 'var(--card)', borderRadius: 16, padding: 24, marginBottom: 24, border: '2px solid #e8002d', boxShadow: '0 4px 20px rgba(232,0,45,0.1)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
             <div>
-              <label style={{ fontWeight: 700, fontSize: 14, color: '#374151', display: 'block', marginBottom: 10 }}>
+              <label style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', display: 'block', marginBottom: 10 }}>
                 {t('maxPriceLabel')}: <span style={{ color: '#e8002d' }}>{effectiveMax} {t('currency')}</span>
               </label>
               <input type="range" min={5} max={maxPriceInData} step={0.5}

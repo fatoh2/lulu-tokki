@@ -200,13 +200,13 @@ export default function ProductDetail() {
             {lowStock && <span style={{ background: '#fff7ed', color: '#f97316', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>🔥 {lang === 'ar' ? `بقي ${product.stock} فقط!` : `Only ${product.stock} left!`}</span>}
           </div>
 
-          <h1 style={{ fontWeight: 800, fontSize: 26, color: '#1a1a2e', margin: 0, lineHeight: 1.3 }}>{product.name}</h1>
+          <h1 style={{ fontWeight: 800, fontSize: 26, color: 'var(--text)', margin: 0, lineHeight: 1.3 }}>{product.name}</h1>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 18, color: s <= Math.round(product.rating) ? '#f59e0b' : '#d1d5db' }}>★</span>)}
             </div>
-            <span style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e' }}>{product.rating}</span>
+            <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)' }}>{product.rating}</span>
             <span style={{ color: '#9ca3af', fontSize: 14 }}>({product.reviews} {t('reviewsLabel')})</span>
           </div>
 
@@ -245,7 +245,7 @@ export default function ProductDetail() {
                   return (
                     <button key={v.label} onClick={() => setSelectedVariantIdx(i)} style={{
                       padding: '10px 18px', borderRadius: 12, border: `2px solid ${isActive ? '#e8002d' : '#e5e7eb'}`,
-                      background: isActive ? '#fff0f2' : 'white', cursor: 'pointer', textAlign: 'center',
+                      background: isActive ? '#fff0f2' : 'var(--card)', cursor: 'pointer', textAlign: 'center',
                       fontFamily: 'Cairo, sans-serif', transition: 'all 0.15s', minWidth: 80,
                     }}>
                       <div style={{ fontWeight: 800, fontSize: 14, color: isActive ? '#e8002d' : '#1a1a2e' }}>{v.label}</div>
@@ -260,11 +260,11 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <p style={{ color: '#374151', fontSize: 15, lineHeight: 1.8, margin: 0 }}>{product.longDescription}</p>
+          <p style={{ color: 'var(--text)', fontSize: 15, lineHeight: 1.8, margin: 0 }}>{product.longDescription}</p>
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {product.tags.map(tag => (
-              <span key={tag} style={{ background: '#f3f4f6', color: '#6b7280', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20 }}>#{tag}</span>
+              <span key={tag} style={{ background: 'var(--muted-bg)', color: 'var(--subtext)', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 20 }}>#{tag}</span>
             ))}
           </div>
 
@@ -279,10 +279,10 @@ export default function ProductDetail() {
           )}
 
           {/* Quantity + Add to cart */}
-          <div style={{ background: '#f8f9fb', borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ background: 'var(--muted-bg)', borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ fontWeight: 700, fontSize: 15, color: '#374151', minWidth: 60 }}>{t('quantityLabel')}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'white', borderRadius: 12, border: '2px solid #e5e7eb', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--card)', borderRadius: 12, border: '2px solid var(--border)', overflow: 'hidden' }}>
                 <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#374151', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>−</button>
                 <span style={{ fontWeight: 800, fontSize: 18, minWidth: 40, textAlign: 'center', color: '#1a1a2e' }}>{qty}</span>
                 <button onClick={() => setQty(q => q + 1)} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#e8002d', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>+</button>
@@ -306,8 +306,8 @@ export default function ProductDetail() {
           </div>
 
           {/* Specs table */}
-          <div style={{ borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-            <div style={{ background: '#f8f9fb', padding: '12px 16px', fontWeight: 800, fontSize: 14, color: '#374151', borderBottom: '1px solid #e5e7eb' }}>{t('specsTitle')}</div>
+          <div style={{ borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--muted-bg)', padding: '12px 16px', fontWeight: 800, fontSize: 14, color: 'var(--text)', borderBottom: '1px solid var(--border)' }}>{t('specsTitle')}</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <tbody>
                 {[
@@ -319,9 +319,9 @@ export default function ProductDetail() {
                   ...(product.heat > 0 ? [[t('specHeat'), `${product.heat}/5 — ${heatLabels[product.heat]}`]] : []),
                   [t('specAvailability'), product.inStock ? t('specAvailable') : t('specOutOfStock')],
                 ].map(([label, value], i) => (
-                  <tr key={label} style={{ background: i % 2 === 0 ? 'white' : '#fafafa' }}>
-                    <td style={{ padding: '10px 16px', fontWeight: 700, color: '#6b7280', width: '40%', borderBottom: '1px solid #f3f4f6' }}>{label}</td>
-                    <td style={{ padding: '10px 16px', color: '#1a1a2e', fontWeight: 600, borderBottom: '1px solid #f3f4f6' }}>{value}</td>
+                  <tr key={label} style={{ background: i % 2 === 0 ? 'var(--card)' : 'var(--muted-bg)' }}>
+                    <td style={{ padding: '10px 16px', fontWeight: 700, color: 'var(--subtext)', width: '40%', borderBottom: '1px solid var(--border)' }}>{label}</td>
+                    <td style={{ padding: '10px 16px', color: 'var(--text)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>{value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -334,7 +334,7 @@ export default function ProductDetail() {
       {related.length > 0 && (
         <div style={{ marginTop: 60 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-            <h2 style={{ fontWeight: 800, fontSize: 20, color: '#1a1a2e', margin: 0 }}>{relatedTitle}</h2>
+            <h2 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', margin: 0 }}>{relatedTitle}</h2>
             <Link to="/store" style={{ color: '#e8002d', textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
               {t('viewAllLink')} ←
             </Link>
@@ -348,7 +348,7 @@ export default function ProductDetail() {
       {/* Recently Viewed */}
       {recentlyViewed.length > 0 && (
         <div style={{ marginTop: 60 }}>
-          <h2 style={{ fontWeight: 800, fontSize: 20, color: '#1a1a2e', marginBottom: 20 }}>
+          <h2 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 20 }}>
             {lang === 'ar' ? '🕐 شاهدتها مؤخراً' : '🕐 Recently Viewed'}
           </h2>
           <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
@@ -358,14 +358,14 @@ export default function ProductDetail() {
                 to={`/product/${p.id}`}
                 style={{ textDecoration: 'none', flexShrink: 0, width: 150 }}
               >
-                <div style={{ background: 'white', borderRadius: 16, padding: 14, border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                <div style={{ background: 'var(--card)', borderRadius: 16, padding: 14, border: 'var(--card-border)', boxShadow: 'var(--shadow-sm)' }}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
                 >
                   <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, #fff5f5, #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
                     {p.imageUrl ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
                   <div style={{ fontWeight: 800, fontSize: 14, color: '#e8002d' }}>{p.price.toFixed(2)} {t('currency')}</div>
                 </div>
               </Link>

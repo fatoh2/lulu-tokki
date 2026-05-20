@@ -41,25 +41,24 @@ export default function ProductCard({ product }) {
   return (
     <div
       style={{
-        background: 'white',
+        background: 'var(--card)',
         borderRadius: 16,
         overflow: 'hidden',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-        border: '1px solid #f0f0f0',
+        boxShadow: 'var(--shadow-md)',
+        border: 'var(--card-border)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'transform 0.2s, box-shadow 0.2s',
         position: 'relative',
         cursor: 'pointer',
       }}
       onClick={() => navigate(`/product/${product.id}`)}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.14)'; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
     >
       {/* Wishlist heart */}
       <button
         onClick={handleWishlist}
-        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, background: wishlisted ? '#fff0f2' : 'rgba(255,255,255,0.9)', border: `2px solid ${wishlisted ? '#e8002d' : '#e5e7eb'}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, background: wishlisted ? '#fff0f2' : 'var(--card)', border: `2px solid ${wishlisted ? '#e8002d' : 'var(--border)'}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, boxShadow: 'var(--shadow-sm)' }}
         title={wishlisted ? t('removeFromWishlist') : t('addToWishlist')}
       >
         {wishlisted ? '❤️' : '🤍'}
@@ -101,35 +100,35 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', lineHeight: 1.4 }} className="line-clamp-2">
+        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', lineHeight: 1.4 }} className="line-clamp-2">
           {product.name}
         </div>
 
-        <div style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.5, flex: 1 }} className="line-clamp-2">
+        <div style={{ fontSize: 12, color: 'var(--subtext)', lineHeight: 1.5, flex: 1 }} className="line-clamp-2">
           {product.description}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ display: 'flex', gap: 2 }}>
             {[1,2,3,4,5].map(s => (
-              <span key={s} style={{ fontSize: 13, color: s <= Math.round(product.rating) ? '#f59e0b' : '#d1d5db' }}>★</span>
+              <span key={s} style={{ fontSize: 13, color: s <= Math.round(product.rating) ? '#f59e0b' : 'var(--border)' }}>★</span>
             ))}
           </div>
-          <span style={{ fontSize: 12, color: '#6b7280' }}>{product.rating} ({product.reviews})</span>
+          <span style={{ fontSize: 12, color: 'var(--subtext)' }}>{product.rating} ({product.reviews})</span>
         </div>
 
-        <div style={{ fontSize: 11, color: '#9ca3af' }}>{product.brand}</div>
+        <div style={{ fontSize: 11, color: 'var(--muted)' }}>{product.brand}</div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-          <div style={{ fontWeight: 800, fontSize: 18, color: '#1a1a2e' }}>
-            {product.price.toFixed(2)} <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280' }}>{t('currency')}</span>
+          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text)' }}>
+            {product.price.toFixed(2)} <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--subtext)' }}>{t('currency')}</span>
           </div>
           <button
             onClick={e => { e.stopPropagation(); handleAdd(); }}
             disabled={outOfStock}
             style={{
-              background: outOfStock ? '#e5e7eb' : inCart ? '#003478' : '#e8002d',
-              color: outOfStock ? '#9ca3af' : 'white',
+              background: outOfStock ? 'var(--muted-bg)' : inCart ? '#003478' : '#e8002d',
+              color: outOfStock ? 'var(--muted)' : 'white',
               border: 'none',
               borderRadius: 10,
               padding: '8px 16px',
@@ -137,7 +136,6 @@ export default function ProductCard({ product }) {
               fontWeight: 700,
               fontSize: 13,
               cursor: outOfStock ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
               whiteSpace: 'nowrap',
             }}
           >
