@@ -4,6 +4,18 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import toast from 'react-hot-toast';
 
+function Field({ label, required, error, children }) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 6 }}>
+        {label} {required && <span style={{ color: '#e8002d' }}>*</span>}
+      </label>
+      {children}
+      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
+    </div>
+  );
+}
+
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
@@ -122,16 +134,6 @@ export default function Checkout() {
       </div>
     );
   }
-
-  const Field = ({ label, required, error, children }) => (
-    <div>
-      <label style={{ display: 'block', fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 6 }}>
-        {label} {required && <span style={{ color: '#e8002d' }}>*</span>}
-      </label>
-      {children}
-      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
-    </div>
-  );
 
   const inputStyle = (hasError) => ({
     width: '100%', padding: '11px 14px', borderRadius: 10,
