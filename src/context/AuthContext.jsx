@@ -8,7 +8,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 
-const ADMIN_EMAILS = ['fatoh.haj@gmail.com'];
+const ADMIN_EMAILS = ['fatoh.haj@gmail.com', 'noorabutamam304@gmail.com'];
 
 const AuthContext = createContext();
 
