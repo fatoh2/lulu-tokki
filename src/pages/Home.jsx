@@ -81,7 +81,7 @@ export default function Home() {
               { num: `${products.length}+`, label: t('heroStatProducts') },
               { num: '5', label: t('heroStatCategories') },
               { num: '100%', label: t('heroStatAuthentic') },
-              { num: '2–4', label: t('heroStatDelivery') },
+              { num: '⚡', label: t('heroStatDelivery') },
             ].map(stat => (
               <div key={stat.label} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 26, fontWeight: 900, color: 'white', lineHeight: 1 }}>{stat.num}</div>

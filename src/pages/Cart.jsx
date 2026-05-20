@@ -25,8 +25,8 @@ export default function Cart() {
   const shipping = totalPrice >= 100 ? 0 : 15;
   const total = totalPrice + shipping;
   const nudge = lang === 'ar'
-    ? `💡 أضف ${(100 - totalPrice).toFixed(2)} ر.س للحصول على شحن مجاني!`
-    : `💡 Add ${(100 - totalPrice).toFixed(2)} SAR more for free shipping!`;
+    ? `💡 أضف ${(100 - totalPrice).toFixed(2)} ₪ للحصول على شحن مجاني!`
+    : `💡 Add ₪${(100 - totalPrice).toFixed(2)} more for free shipping!`;
   const itemsText = lang === 'ar'
     ? `${items.length} ${items.length === 1 ? 'منتج' : 'منتجات'} في سلتك`
     : `${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`;

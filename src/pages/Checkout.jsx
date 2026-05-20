@@ -7,19 +7,12 @@ import toast from 'react-hot-toast';
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
-  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', city: '', district: '', street: '', building: '', notes: '' });
   const [errors, setErrors] = useState({});
 
   const shipping = totalPrice >= 100 ? 0 : 15;
   const total = totalPrice + shipping;
-
-  const paymentMethods = [
-    { id: 'cod', label: t('pmCod'), icon: '💵', desc: t('pmCodDesc') },
-    { id: 'credit', label: t('pmCredit'), icon: '💳', desc: t('pmCreditDesc') },
-    { id: 'stcpay', label: t('pmStc'), icon: '📱', desc: t('pmStcDesc') },
-  ];
 
   const update = (field, val) => {
     setForm(f => ({ ...f, [field]: val }));
@@ -44,6 +37,47 @@ export default function Checkout() {
       toast.error(t('formError'), { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr' } });
       return;
     }
+
+    const sep = '━━━━━━━━━━━━━━━';
+    const itemLines = items.map(item => `• ${item.name} × ${item.quantity} — ₪${(item.price * item.quantity).toFixed(2)}`).join('\n');
+    const shippingText = shipping === 0
+      ? (lang === 'ar' ? 'مجاني 🎉' : 'Free 🎉')
+      : `₪${shipping.toFixed(2)}`;
+    const addressParts = [form.city, form.district, form.street, form.building].filter(Boolean).join(', ');
+
+    const msg = lang === 'ar'
+      ? [
+          '🛒 طلب جديد - هانوك سناكس',
+          sep,
+          `👤 الاسم: ${form.name}`,
+          `📱 الجوال: ${form.phone}`,
+          `📍 العنوان: ${addressParts}`,
+          form.notes.trim() ? `📝 ملاحظات: ${form.notes}` : '',
+          sep,
+          '🛍️ المنتجات:',
+          itemLines,
+          sep,
+          `💰 المجموع الفرعي: ₪${totalPrice.toFixed(2)}`,
+          `🚚 الشحن: ${shippingText}`,
+          `✅ الإجمالي: ₪${total.toFixed(2)}`,
+        ].filter(line => line !== '').join('\n')
+      : [
+          '🛒 New Order - Hanook Snacks',
+          sep,
+          `👤 Name: ${form.name}`,
+          `📱 Phone: ${form.phone}`,
+          `📍 Address: ${addressParts}`,
+          form.notes.trim() ? `📝 Notes: ${form.notes}` : '',
+          sep,
+          '🛍️ Items:',
+          itemLines,
+          sep,
+          `💰 Subtotal: ₪${totalPrice.toFixed(2)}`,
+          `🚚 Shipping: ${shippingText}`,
+          `✅ Total: ₪${total.toFixed(2)}`,
+        ].filter(line => line !== '').join('\n');
+
+    window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');
     setSubmitted(true);
     clearCart();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -62,20 +96,21 @@ export default function Checkout() {
   }
 
   if (submitted) {
-    const thankYou = lang === 'ar'
-      ? <p style={{ color: '#6b7280', fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>شكراً لك يا <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</p>
-      : <p style={{ color: '#6b7280', fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>Thank you, <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</p>;
-    const contactMsg = lang === 'ar'
-      ? <p style={{ color: '#6b7280', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>سنتواصل معك على <strong style={{ color: '#1a1a2e' }}>{form.phone}</strong> لتأكيد الطلب. وجباتك الكورية في طريقها إليك! 🇰🇷</p>
-      : <p style={{ color: '#6b7280', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>We'll contact you at <strong style={{ color: '#1a1a2e' }}>{form.phone}</strong> to confirm your order. Your Korean snacks are on the way! 🇰🇷</p>;
-
     return (
       <div style={{ maxWidth: 560, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
         <div style={{ background: 'white', borderRadius: 24, padding: 48, boxShadow: '0 8px 40px rgba(0,0,0,0.1)' }}>
-          <div style={{ fontSize: 72, marginBottom: 16 }}>🎉</div>
+          <div style={{ fontSize: 72, marginBottom: 16 }}>📲</div>
           <h2 style={{ fontWeight: 800, fontSize: 26, color: '#1a1a2e', marginBottom: 10 }}>{t('orderSuccessTitle')}</h2>
-          {thankYou}
-          {contactMsg}
+          <p style={{ color: '#6b7280', fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>
+            {lang === 'ar'
+              ? <>شكراً لك يا <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</>
+              : <>Thank you, <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</>}
+          </p>
+          <p style={{ color: '#6b7280', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>
+            {lang === 'ar'
+              ? 'تم فتح واتساب لإرسال طلبك. سنتواصل معك لتأكيد التفاصيل. 🇰🇷'
+              : 'WhatsApp opened to send your order. We\'ll reach out to confirm the details. 🇰🇷'}
+          </p>
           <div style={{ background: '#f8f9fb', borderRadius: 12, padding: '16px 24px', marginBottom: 32 }}>
             <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>{t('orderTotalLabel')}</div>
             <div style={{ fontWeight: 800, fontSize: 22, color: '#e8002d' }}>{total.toFixed(2)} {t('currency')}</div>
@@ -162,27 +197,6 @@ export default function Checkout() {
                 </div>
               </div>
             </div>
-
-            {/* Payment */}
-            <div style={{ background: 'white', borderRadius: 20, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-              <h3 style={{ fontWeight: 800, fontSize: 17, color: '#1a1a2e', marginTop: 0, marginBottom: 20, paddingBottom: 12, borderBottom: '2px solid #f3f4f6' }}>
-                {t('paymentTitle')}
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {paymentMethods.map(pm => (
-                  <label key={pm.id} onClick={() => setPaymentMethod(pm.id)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 12, border: `2px solid ${paymentMethod === pm.id ? '#e8002d' : '#e5e7eb'}`, background: paymentMethod === pm.id ? '#fff0f2' : 'white', cursor: 'pointer', transition: 'all 0.2s' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, border: `2px solid ${paymentMethod === pm.id ? '#e8002d' : '#d1d5db'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {paymentMethod === pm.id && <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#e8002d' }} />}
-                    </div>
-                    <span style={{ fontSize: 22 }}>{pm.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{pm.label}</div>
-                      <div style={{ fontSize: 12, color: '#6b7280' }}>{pm.desc}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Order Summary */}
@@ -219,9 +233,9 @@ export default function Checkout() {
                   </div>
                 </div>
               </div>
-              <button type="submit" style={{ width: '100%', marginTop: 20, padding: '14px 20px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-                onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+              <button type="submit" style={{ width: '100%', marginTop: 20, padding: '14px 20px', background: '#25d366', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#1aab52'}
+                onMouseLeave={e => e.currentTarget.style.background = '#25d366'}
               >
                 {t('confirmOrderBtn')}
               </button>
