@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
 import { useCart } from '../context/CartContext';
@@ -52,6 +52,23 @@ export default function ProductDetail() {
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
 
   const product = products.find(p => p.id === Number(id));
+
+  const recentlyViewed = useMemo(() => {
+    if (!product) return [];
+    try {
+      const ids = JSON.parse(localStorage.getItem('hanook-recently-viewed')) || [];
+      return ids.filter(rid => rid !== product.id).slice(0, 6).map(rid => products.find(p => p.id === rid)).filter(Boolean);
+    } catch { return []; }
+  }, [product?.id, products]);
+
+  useEffect(() => {
+    if (!product) return;
+    try {
+      const key = 'hanook-recently-viewed';
+      const existing = JSON.parse(localStorage.getItem(key)) || [];
+      localStorage.setItem(key, JSON.stringify([product.id, ...existing.filter(id => id !== product.id)].slice(0, 8)));
+    } catch {}
+  }, [product?.id]);
 
   if (!product) {
     return (
@@ -324,6 +341,35 @@ export default function ProductDetail() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
             {related.map(p => <ProductCard key={p.id} product={p} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <div style={{ marginTop: 60 }}>
+          <h2 style={{ fontWeight: 800, fontSize: 20, color: '#1a1a2e', marginBottom: 20 }}>
+            {lang === 'ar' ? '🕐 شاهدتها مؤخراً' : '🕐 Recently Viewed'}
+          </h2>
+          <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
+            {recentlyViewed.map(p => (
+              <Link
+                key={p.id}
+                to={`/product/${p.id}`}
+                style={{ textDecoration: 'none', flexShrink: 0, width: 150 }}
+              >
+                <div style={{ background: 'white', borderRadius: 16, padding: 14, border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
+                >
+                  <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, #fff5f5, #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
+                    {p.imageUrl ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: '#e8002d' }}>{p.price.toFixed(2)} {t('currency')}</div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}
