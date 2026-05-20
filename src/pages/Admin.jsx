@@ -30,12 +30,24 @@ function Field({ label, required, error, children }) {
 }
 
 export default function Admin() {
-  const { products, addProduct, removeProduct } = useProducts();
+  const { products, addProduct, removeProduct, seedProducts } = useProducts();
   const [tab, setTab] = useState('list'); // 'list' | 'add'
   const [search, setSearch] = useState('');
   const [confirmId, setConfirmId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
+  const [seeding, setSeeding] = useState(false);
+  const [seeded, setSeeded] = useState(false);
+
+  const handleSeed = async () => {
+    setSeeding(true);
+    try {
+      await seedProducts();
+      setSeeded(true);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const filtered = products.filter(p =>
     !search.trim() ||
@@ -107,6 +119,24 @@ export default function Admin() {
           <Badge color="#003478" bg="#eff6ff">{products.length} منتج إجمالاً</Badge>
         </div>
       </div>
+
+      {/* Seed banner — shown when DB is empty */}
+      {products.length === 0 && !seeded && (
+        <div style={{ background: '#fffbeb', border: '2px solid #fbbf24', borderRadius: 14, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 15, color: '#92400e' }}>⚠️ قاعدة البيانات فارغة</div>
+            <div style={{ fontSize: 13, color: '#92400e', marginTop: 2 }}>لا يوجد منتجات في Firestore. اضغط لتعبئتها من الملف المحلي.</div>
+          </div>
+          <button onClick={handleSeed} disabled={seeding} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: seeding ? 'wait' : 'pointer', opacity: seeding ? 0.7 : 1 }}>
+            {seeding ? '⏳ جاري التعبئة...' : '📦 تعبئة قاعدة البيانات'}
+          </button>
+        </div>
+      )}
+      {seeded && (
+        <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 14, padding: '14px 20px', marginBottom: 20, fontWeight: 700, color: '#166534' }}>
+          ✅ تم تعبئة قاعدة البيانات بنجاح!
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'white', borderRadius: 12, padding: 4, border: '1px solid #e5e7eb', width: 'fit-content' }}>

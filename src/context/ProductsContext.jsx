@@ -59,8 +59,15 @@ export function ProductsProvider({ children }) {
     setProducts(prev => prev.filter(p => p.id !== id));
   }, []);
 
+  const seedProducts = useCallback(async () => {
+    const batch = writeBatch(db);
+    baseProducts.forEach(p => batch.set(doc(db, 'products', String(p.id)), p));
+    await batch.commit();
+    setProducts([...baseProducts].sort((a, b) => a.id - b.id));
+  }, []);
+
   return (
-    <ProductsContext.Provider value={{ products, loading, addProduct, removeProduct }}>
+    <ProductsContext.Provider value={{ products, loading, addProduct, removeProduct, seedProducts }}>
       {children}
     </ProductsContext.Provider>
   );
