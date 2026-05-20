@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebase';
 import { useProducts } from '../context/ProductsContext';
 import toast from 'react-hot-toast';
 
@@ -38,6 +40,17 @@ export default function Admin() {
   const [errors, setErrors] = useState({});
   const [seeding, setSeeding] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -75,17 +88,33 @@ export default function Admin() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    await addProduct({
-      ...form,
-      price: Number(form.price),
-      heat: Number(form.heat),
-      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
-    });
-    toast.success(`تم إضافة "${form.name}" بنجاح! ✅`, {
-      style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
-    });
-    setForm(EMPTY_FORM);
-    setTab('list');
+    setSubmitting(true);
+    try {
+      let imageUrl = '';
+      if (imageFile) {
+        const maxId = products.reduce((max, p) => Math.max(max, p.id), 0);
+        const newId = maxId + 1;
+        const imgRef = storageRef(storage, `product-images/${newId}`);
+        await uploadBytes(imgRef, imageFile);
+        imageUrl = await getDownloadURL(imgRef);
+      }
+      await addProduct({
+        ...form,
+        price: Number(form.price),
+        heat: Number(form.heat),
+        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+        ...(imageUrl ? { imageUrl } : {}),
+      });
+      toast.success(`تم إضافة "${form.name}" بنجاح! ✅`, {
+        style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+      });
+      setForm(EMPTY_FORM);
+      setImageFile(null);
+      setImagePreview('');
+      setTab('list');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleRemove = async (id) => {
@@ -318,6 +347,37 @@ export default function Admin() {
                 />
               </Field>
 
+              {/* Image upload */}
+              <div style={{ gridColumn: '1 / -1' }}>
+                <Field label="صورة المنتج (اختياري — تحل محل الإيموجي)">
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{ border: '2px dashed #e5e7eb', borderRadius: 12, padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'border-color 0.2s', background: '#fafafa' }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = '#e8002d'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}
+                  >
+                    {imagePreview ? (
+                      <>
+                        <img src={imagePreview} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{imageFile?.name}</div>
+                          <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4 }}>اضغط لتغيير الصورة</div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ width: 72, height: 72, borderRadius: 10, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>📷</div>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: '#374151' }}>اضغط لرفع صورة</div>
+                          <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>PNG, JPG, WEBP — بدون صورة يُستخدم الإيموجي</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} />
+                </Field>
+              </div>
+
               {/* Weight */}
               <Field label="الوزن">
                 <input value={form.weight} onChange={e => set('weight', e.target.value)}
@@ -396,13 +456,13 @@ export default function Admin() {
             </div>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 24, borderTop: '2px solid #f3f4f6', paddingTop: 20 }}>
-              <button type="submit" style={{ flex: 1, padding: '13px 20px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-                onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+              <button type="submit" disabled={submitting} style={{ flex: 1, padding: '13px 20px', background: submitting ? '#9ca3af' : '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: submitting ? 'wait' : 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = '#b5001f'; }}
+                onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = '#e8002d'; }}
               >
-                ✅ إضافة المنتج للمتجر
+                {submitting ? (imageFile ? '⏳ جاري رفع الصورة...' : '⏳ جاري الحفظ...') : '✅ إضافة المنتج للمتجر'}
               </button>
-              <button type="button" onClick={() => { setForm(EMPTY_FORM); setErrors({}); }}
+              <button type="button" onClick={() => { setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); }}
                 style={{ padding: '13px 24px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
               >
                 مسح النموذج

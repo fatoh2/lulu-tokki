@@ -77,8 +77,10 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Image */}
-      <div style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%)', height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72 }}>
-        {product.emoji}
+      <div style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%)', height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72, overflow: 'hidden' }}>
+        {product.imageUrl
+          ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          : product.emoji}
       </div>
 
       {/* Content */}
