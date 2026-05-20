@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -13,6 +15,19 @@ export default function Account() {
   const { products } = useProducts();
   const navigate = useNavigate();
   const [tab, setTab] = useState('history');
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { setOrders([]); setOrdersLoading(false); return; }
+    const q = query(collection(db, 'orders'), where('userId', '==', user.id));
+    getDocs(q).then(snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      docs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setOrders(docs);
+      setOrdersLoading(false);
+    }).catch(() => setOrdersLoading(false));
+  }, [user?.id]);
 
   if (!user) {
     return (
@@ -30,10 +45,6 @@ export default function Account() {
       </div>
     );
   }
-
-  const orders = (() => {
-    try { return JSON.parse(localStorage.getItem(`hanook-orders-${user.id}`) || '[]'); } catch { return []; }
-  })();
 
   const wishlistProducts = products.filter(p => wishlist.includes(p.id));
 

@@ -34,11 +34,11 @@ export default function Signup() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    const result = signup(form.name.trim(), form.email.trim(), form.password);
+    const result = await signup(form.name.trim(), form.email.trim(), form.password);
     if (result.error === 'emailExists') {
       setErrors({ email: t('emailExistsError') });
     } else {

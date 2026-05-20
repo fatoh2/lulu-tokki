@@ -13,6 +13,8 @@ function useIsMobile() {
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 function Field({ label, required, error, children }) {
@@ -54,7 +56,7 @@ export default function Checkout() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -103,10 +105,18 @@ export default function Checkout() {
         ].filter(line => line !== '').join('\n');
 
     if (user) {
-      const ordersKey = `hanook-orders-${user.id}`;
-      const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
-      orders.unshift({ id: Date.now().toString(), date: new Date().toISOString(), items: [...items], subtotal: totalPrice, shipping, total });
-      localStorage.setItem(ordersKey, JSON.stringify(orders));
+      try {
+        await addDoc(collection(db, 'orders'), {
+          userId: user.id,
+          date: new Date().toISOString(),
+          items: items.map(({ id, name, emoji, price, quantity }) => ({ id, name, emoji, price, quantity })),
+          subtotal: totalPrice,
+          shipping,
+          total,
+        });
+      } catch (e) {
+        console.error('Failed to save order', e);
+      }
     }
 
     window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');

@@ -1,32 +1,33 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext();
 
 export function WishlistProvider({ children }) {
   const { user } = useAuth();
-  const key = user ? `hanook-wishlist-${user.id}` : null;
-
-  const [wishlist, setWishlist] = useState(() => {
-    if (!key) return [];
-    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-  });
+  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
-    if (key) {
-      try { setWishlist(JSON.parse(localStorage.getItem(key) || '[]')); } catch { setWishlist([]); }
-    } else {
-      setWishlist([]);
-    }
+    if (!user) { setWishlist([]); return; }
+    getDoc(doc(db, 'wishlists', user.id)).then(snap => {
+      setWishlist(snap.exists() ? snap.data().productIds || [] : []);
+    });
   }, [user?.id]);
 
-  useEffect(() => {
-    if (key) localStorage.setItem(key, JSON.stringify(wishlist));
-  }, [wishlist, key]);
+  const save = (list, uid) =>
+    setDoc(doc(db, 'wishlists', uid), { productIds: list });
 
   const toggleWishlist = (productId) => {
     if (!user) return false;
-    setWishlist(w => w.includes(productId) ? w.filter(id => id !== productId) : [...w, productId]);
+    setWishlist(prev => {
+      const next = prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId];
+      save(next, user.id);
+      return next;
+    });
     return true;
   };
 

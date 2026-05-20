@@ -13,9 +13,9 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = login(form.email, form.password);
+    const result = await login(form.email, form.password);
     if (result.error) {
       setError(t('invalidCredentialsError'));
     } else {

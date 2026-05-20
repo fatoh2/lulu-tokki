@@ -1,51 +1,68 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from 'firebase/auth';
 
 const ADMIN_EMAILS = ['fatoh.haj@gmail.com'];
-const USERS_KEY = 'hanook-users';
-const SESSION_KEY = 'hanook-session';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; }
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const signup = (name, email, password) => {
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-    if (users.find(u => u.email === email.toLowerCase())) return { error: 'emailExists' };
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email: email.toLowerCase(),
-      password: btoa(unescape(encodeURIComponent(password))),
-      isAdmin: ADMIN_EMAILS.includes(email.toLowerCase()),
-    };
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, newUser]));
-    const session = { id: newUser.id, name, email: newUser.email, isAdmin: newUser.isAdmin };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    setUser(session);
-    return { success: true };
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        setUser({
+          id: fbUser.uid,
+          name: fbUser.displayName || fbUser.email.split('@')[0],
+          email: fbUser.email,
+          isAdmin: ADMIN_EMAILS.includes(fbUser.email.toLowerCase()),
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const signup = async (name, email, password) => {
+    try {
+      const { user: fbUser } = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(fbUser, { displayName: name });
+      setUser({
+        id: fbUser.uid,
+        name,
+        email: fbUser.email,
+        isAdmin: ADMIN_EMAILS.includes(fbUser.email.toLowerCase()),
+      });
+      return { success: true };
+    } catch (err) {
+      if (err.code === 'auth/email-already-in-use') return { error: 'emailExists' };
+      return { error: 'unknown' };
+    }
   };
 
-  const login = (email, password) => {
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-    const encoded = btoa(unescape(encodeURIComponent(password)));
-    const found = users.find(u => u.email === email.toLowerCase() && u.password === encoded);
-    if (!found) return { error: 'invalidCredentials' };
-    const session = { id: found.id, name: found.name, email: found.email, isAdmin: ADMIN_EMAILS.includes(found.email) };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    setUser(session);
-    return { success: true };
+  const login = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch {
+      return { error: 'invalidCredentials' };
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem(SESSION_KEY);
-    setUser(null);
-  };
+  const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

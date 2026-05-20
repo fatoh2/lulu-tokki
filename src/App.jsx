@@ -25,6 +25,12 @@ function AdminRoute({ children }) {
 }
 
 function AppInner() {
+  const { loading } = useAuth();
+  if (loading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
+      🇰🇷
+    </div>
+  );
   return (
     <>
       <Toaster position="bottom-center" />
