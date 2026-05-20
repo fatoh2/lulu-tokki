@@ -11,18 +11,26 @@ export function ProductsProvider({ children }) {
 
   useEffect(() => {
     async function load() {
-      const snap = await getDocs(collection(db, 'products'));
-      if (snap.empty) {
-        // First run — seed from local JSON
-        const batch = writeBatch(db);
-        baseProducts.forEach(p => batch.set(doc(db, 'products', String(p.id)), p));
-        await batch.commit();
+      try {
+        const snap = await getDocs(collection(db, 'products'));
+        if (snap.empty) {
+          // Try to seed — only succeeds when admin is logged in
+          try {
+            const batch = writeBatch(db);
+            baseProducts.forEach(p => batch.set(doc(db, 'products', String(p.id)), p));
+            await batch.commit();
+          } catch {
+            // Not admin yet — fall back to local JSON silently
+          }
+          setProducts([...baseProducts].sort((a, b) => a.id - b.id));
+        } else {
+          setProducts(snap.docs.map(d => d.data()).sort((a, b) => a.id - b.id));
+        }
+      } catch {
         setProducts([...baseProducts].sort((a, b) => a.id - b.id));
-      } else {
-        const docs = snap.docs.map(d => d.data()).sort((a, b) => a.id - b.id);
-        setProducts(docs);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     load();
   }, []);
