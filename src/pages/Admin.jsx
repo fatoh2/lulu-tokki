@@ -8,7 +8,7 @@ const CATEGORIES = ['رامن', 'رقائق', 'حلوى', 'مشروبات', 'ب�
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'رامن',
   emoji: '🍜', brand: '', weight: '', servings: '',
-  heat: 0, inStock: true, tags: '',
+  heat: 0, inStock: true, stock: '', tags: '',
 };
 
 function Badge({ children, color = '#e8002d', bg = '#fff0f2' }) {
@@ -76,6 +76,7 @@ export default function Admin() {
       servings: p.servings ?? '',
       heat: p.heat ?? 0,
       inStock: p.inStock ?? true,
+      stock: p.stock != null ? String(p.stock) : '',
       tags: (p.tags ?? []).join(', '),
     });
     setImagePreview(p.imageUrl ?? '');
@@ -119,10 +120,13 @@ export default function Admin() {
         await uploadBytes(imgRef, imageFile);
         imageUrl = await getDownloadURL(imgRef);
       }
+      const stockVal = form.stock !== '' ? Number(form.stock) : null;
       const data = {
         ...form,
         price: Number(form.price),
         heat: Number(form.heat),
+        stock: stockVal,
+        inStock: stockVal == null ? form.inStock : stockVal > 0,
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         ...(imageUrl ? { imageUrl } : {}),
       };
@@ -274,9 +278,11 @@ export default function Admin() {
                 <div style={{ fontWeight: 800, fontSize: 14, color: '#1a1a2e' }}>{p.price.toFixed(2)}</div>
                 <div style={{ fontSize: 13, color: '#f59e0b', fontWeight: 700 }}>{p.rating > 0 ? `${p.rating}★` : '—'}</div>
                 <div>
-                  {p.inStock
-                    ? <Badge color="#16a34a" bg="#f0fdf4">✅ متاح</Badge>
-                    : <Badge color="#6b7280" bg="#f3f4f6">❌ نفد</Badge>
+                  {!p.inStock
+                    ? <Badge color="#6b7280" bg="#f3f4f6">❌ نفد</Badge>
+                    : p.stock != null && p.stock <= 5
+                      ? <Badge color="#d97706" bg="#fffbeb">⚠️ {p.stock} فقط</Badge>
+                      : <Badge color="#16a34a" bg="#f0fdf4">✅ {p.stock != null ? p.stock : '∞'}</Badge>
                   }
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
@@ -430,6 +436,16 @@ export default function Admin() {
               <Field label="الحصص">
                 <input value={form.servings} onChange={e => set('servings', e.target.value)}
                   placeholder="مثال: حصتان"
+                  style={inputStyle(false)}
+                  onFocus={e => e.target.style.borderColor = '#e8002d'}
+                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                />
+              </Field>
+
+              {/* Stock */}
+              <Field label="الكمية المتوفرة (اتركه فارغاً = غير محدود)">
+                <input type="number" min="0" step="1" value={form.stock} onChange={e => set('stock', e.target.value)}
+                  placeholder="مثال: 10"
                   style={inputStyle(false)}
                   onFocus={e => e.target.style.borderColor = '#e8002d'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}

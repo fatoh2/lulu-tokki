@@ -69,6 +69,8 @@ export default function ProductDetail() {
   const views = galleryBg.map((v, i) => ({ ...v, label: galleryLabels[i] }));
   const heatLabels = t('heatLabels');
   const inCart = items.find(i => i.id === product.id);
+  const outOfStock = !product.inStock || product.stock === 0;
+  const lowStock = product.inStock && product.stock != null && product.stock > 0 && product.stock <= 5;
 
   const handleAddToCart = () => {
     if (inCart) {
@@ -170,7 +172,8 @@ export default function ProductDetail() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ background: '#fff0f2', color: '#e8002d', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.category}</span>
             <span style={{ background: '#eff6ff', color: '#003478', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.brand}</span>
-            {!product.inStock && <span style={{ background: '#f3f4f6', color: '#6b7280', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{t('outOfStockBadge')}</span>}
+            {outOfStock && <span style={{ background: '#f3f4f6', color: '#6b7280', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{t('outOfStockBadge')}</span>}
+            {lowStock && <span style={{ background: '#fff7ed', color: '#f97316', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>🔥 {lang === 'ar' ? `بقي ${product.stock} فقط!` : `Only ${product.stock} left!`}</span>}
           </div>
 
           <h1 style={{ fontWeight: 800, fontSize: 26, color: '#1a1a2e', margin: 0, lineHeight: 1.3 }}>{product.name}</h1>
@@ -208,6 +211,16 @@ export default function ProductDetail() {
             ))}
           </div>
 
+          {/* Low stock warning */}
+          {lowStock && (
+            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 18 }}>⏳</span>
+              <span style={{ fontWeight: 700, fontSize: 14, color: '#c2410c' }}>
+                {lang === 'ar' ? `بقي ${product.stock} قطعة فقط في المخزن!` : `Only ${product.stock} left in stock!`}
+              </span>
+            </div>
+          )}
+
           {/* Quantity + Add to cart */}
           <div style={{ background: '#f8f9fb', borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -222,12 +235,12 @@ export default function ProductDetail() {
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={handleAddToCart}
-                disabled={!product.inStock}
-                style={{ flex: 1, padding: '14px 20px', background: product.inStock ? '#e8002d' : '#e5e7eb', color: product.inStock ? 'white' : '#9ca3af', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: product.inStock ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}
-                onMouseEnter={e => { if (product.inStock) e.currentTarget.style.background = '#b5001f'; }}
-                onMouseLeave={e => { if (product.inStock) e.currentTarget.style.background = '#e8002d'; }}
+                disabled={outOfStock}
+                style={{ flex: 1, padding: '14px 20px', background: outOfStock ? '#e5e7eb' : '#e8002d', color: outOfStock ? '#9ca3af' : 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: outOfStock ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => { if (!outOfStock) e.currentTarget.style.background = '#b5001f'; }}
+                onMouseLeave={e => { if (!outOfStock) e.currentTarget.style.background = '#e8002d'; }}
               >
-                {product.inStock ? addToCartLabel : t('unavailableBtn')}
+                {outOfStock ? t('unavailableBtn') : addToCartLabel}
               </button>
               <Link to="/cart" style={{ padding: '14px 20px', borderRadius: 12, border: '2px solid #e8002d', color: '#e8002d', textDecoration: 'none', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 {t('viewCartBtn')}

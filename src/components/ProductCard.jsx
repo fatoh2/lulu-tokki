@@ -13,6 +13,8 @@ export default function ProductCard({ product }) {
   const { toggleWishlist, inWishlist } = useWishlist();
   const inCart = items.find(i => i.id === product.id);
   const wishlisted = inWishlist(product.id);
+  const outOfStock = !product.inStock || product.stock === 0;
+  const lowStock = product.inStock && product.stock != null && product.stock > 0 && product.stock <= 5;
 
   const handleWishlist = (e) => {
     e.stopPropagation();
@@ -71,8 +73,11 @@ export default function ProductCard({ product }) {
         {product.isFeatured && (
           <span style={{ background: '#e8002d', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeFeatured')}</span>
         )}
-        {!product.inStock && (
+        {outOfStock && (
           <span style={{ background: '#6b7280', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeOutOfStock')}</span>
+        )}
+        {lowStock && (
+          <span style={{ background: '#f97316', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>🔥 {isRTL ? `بقي ${product.stock} فقط!` : `Only ${product.stock} left!`}</span>
         )}
       </div>
 
@@ -121,22 +126,22 @@ export default function ProductCard({ product }) {
           </div>
           <button
             onClick={e => { e.stopPropagation(); handleAdd(); }}
-            disabled={!product.inStock}
+            disabled={outOfStock}
             style={{
-              background: !product.inStock ? '#e5e7eb' : inCart ? '#003478' : '#e8002d',
-              color: !product.inStock ? '#9ca3af' : 'white',
+              background: outOfStock ? '#e5e7eb' : inCart ? '#003478' : '#e8002d',
+              color: outOfStock ? '#9ca3af' : 'white',
               border: 'none',
               borderRadius: 10,
               padding: '8px 16px',
               fontFamily: 'Cairo, sans-serif',
               fontWeight: 700,
               fontSize: 13,
-              cursor: product.inStock ? 'pointer' : 'not-allowed',
+              cursor: outOfStock ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
               whiteSpace: 'nowrap',
             }}
           >
-            {!product.inStock ? t('outOfStock') : inCart ? t('inCart') : t('addToCart')}
+            {outOfStock ? t('outOfStock') : inCart ? t('inCart') : t('addToCart')}
           </button>
         </div>
       </div>
