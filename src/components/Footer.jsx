@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Footer() {
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const links = [
     { label: t('footerHome'), to: '/' },
@@ -74,6 +76,9 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '20px 0', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
           🇰🇷 {t('storeName')} © {new Date().getFullYear()} — {t('footerRights')}
+          {user?.isAdmin && (
+            <Link to="/admin" style={{ marginInlineStart: 12, color: 'rgba(255,255,255,0.12)', fontSize: 11, textDecoration: 'none' }} title="">⚙</Link>
+          )}
         </div>
       </div>
     </footer>

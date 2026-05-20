@@ -12,6 +12,7 @@ function useIsMobile() {
 }
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 function Field({ label, required, error, children }) {
@@ -29,6 +30,7 @@ function Field({ label, required, error, children }) {
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', city: '', district: '', street: '', building: '', notes: '' });
@@ -99,6 +101,13 @@ export default function Checkout() {
           `🚚 Shipping: ${shippingText}`,
           `✅ Total: ₪${total.toFixed(2)}`,
         ].filter(line => line !== '').join('\n');
+
+    if (user) {
+      const ordersKey = `hanook-orders-${user.id}`;
+      const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+      orders.unshift({ id: Date.now().toString(), date: new Date().toISOString(), items: [...items], subtotal: totalPrice, shipping, total });
+      localStorage.setItem(ordersKey, JSON.stringify(orders));
+    }
 
     window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');
     setSubmitted(true);

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useWishlist } from '../context/WishlistContext';
 import toast from 'react-hot-toast';
 
 const HEAT_LABELS = ['', '🌶️', '🌶️🌶️', '🌶️🌶️🌶️', '🌶️🌶️🌶️🌶️', '🌶️🌶️🌶️🌶️🌶️'];
@@ -9,7 +10,20 @@ export default function ProductCard({ product }) {
   const { addItem, items } = useCart();
   const navigate = useNavigate();
   const { t, isRTL } = useLanguage();
+  const { toggleWishlist, inWishlist } = useWishlist();
   const inCart = items.find(i => i.id === product.id);
+  const wishlisted = inWishlist(product.id);
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    const added = toggleWishlist(product.id);
+    if (!added) {
+      toast(isRTL ? t('loginToWishlistMsg') : t('loginToWishlistMsg'), {
+        icon: '❤️',
+        style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr' },
+      });
+    }
+  };
 
   const handleAdd = () => {
     addItem(product);
@@ -40,6 +54,15 @@ export default function ProductCard({ product }) {
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'; }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)'; }}
     >
+      {/* Wishlist heart */}
+      <button
+        onClick={handleWishlist}
+        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, background: wishlisted ? '#fff0f2' : 'rgba(255,255,255,0.9)', border: `2px solid ${wishlisted ? '#e8002d' : '#e5e7eb'}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+        title={wishlisted ? t('removeFromWishlist') : t('addToWishlist')}
+      >
+        {wishlisted ? '❤️' : '🤍'}
+      </button>
+
       {/* Badges */}
       <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 1 }}>
         {product.isNew && (
