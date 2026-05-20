@@ -3,12 +3,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAx3RL4nt83Jc_4ykvI3SdLR6vFWiNQlkI",
-  authDomain: "korean-snacks.firebaseapp.com",
-  projectId: "korean-snacks",
-  storageBucket: "korean-snacks.firebasestorage.app",
-  messagingSenderId: "914383758279",
-  appId: "1:914383758279:web:726ff976cfcc8db5422fe2",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
