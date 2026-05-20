@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import toast from 'react-hot-toast';
@@ -19,6 +29,7 @@ function Field({ label, required, error, children }) {
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const { t, lang, isRTL } = useLanguage();
+  const isMobile = useIsMobile();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', city: '', district: '', street: '', building: '', notes: '' });
   const [errors, setErrors] = useState({});
@@ -151,7 +162,7 @@ export default function Checkout() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 360px', gap: 24, alignItems: 'start' }}>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -202,7 +213,7 @@ export default function Checkout() {
           </div>
 
           {/* Order Summary */}
-          <div style={{ position: 'sticky', top: 84 }}>
+          <div style={{ position: isMobile ? 'static' : 'sticky', top: 84 }}>
             <div style={{ background: 'white', borderRadius: 20, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
               <h3 style={{ fontWeight: 800, fontSize: 18, color: '#1a1a2e', marginTop: 0, marginBottom: 20 }}>{t('orderSummaryTitle')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20, maxHeight: 280, overflowY: 'auto' }}>

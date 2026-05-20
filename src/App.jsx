@@ -18,7 +18,7 @@ export default function App() {
       <LanguageProvider>
         <ProductsProvider>
           <CartProvider>
-            <Toaster position="top-center" />
+            <Toaster position="bottom-center" />
             <Navbar />
             <main style={{ flex: 1, background: '#f8f9fb' }}>
               <Routes>
