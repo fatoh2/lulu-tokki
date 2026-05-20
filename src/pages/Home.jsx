@@ -14,7 +14,7 @@ function useIsMobile() {
   return isMobile;
 }
 
-const HERO_PHOTO = 'https://images.unsplash.com/photo-1563998957248-b59e18407396?w=600&h=500&fit=crop&crop=center&q=80';
+const HERO_PHOTO = 'https://plus.unsplash.com/premium_photo-1700830647950-6bba9ca2a957?fm=jpg&q=80&w=600&h=500&auto=format&fit=crop';
 
 const CATEGORIES = [
   { key: 'رامن', emoji: '🍜', tKey: 'catRamen' },
