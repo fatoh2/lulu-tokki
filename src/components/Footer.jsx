@@ -12,7 +12,7 @@ export default function Footer() {
 
   const contacts = [
     { icon: '📧', text: t('footerEmail') },
-    { icon: '📞', text: t('footerPhone') },
+    { icon: '📞', text: t('footerPhone'), ltr: true },
     { icon: '📍', text: t('footerAddress') },
     { icon: '🕐', text: t('footerHours') },
   ];
@@ -65,7 +65,7 @@ export default function Footer() {
               {contacts.map(item => (
                 <div key={item.icon} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, color: 'rgba(255,255,255,0.55)', fontSize: 14, lineHeight: 1.5 }}>
                   <span style={{ flexShrink: 0 }}>{item.icon}</span>
-                  <span>{item.text}</span>
+                  <span dir={item.ltr ? 'ltr' : undefined}>{item.text}</span>
                 </div>
               ))}
             </div>
