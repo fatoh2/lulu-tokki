@@ -16,7 +16,7 @@ function useIsMobile() {
 
 export default function Navbar() {
   const { totalItems } = useCart();
-  const { t, toggleLang } = useLanguage();
+  const { t, toggleLang, lang } = useLanguage();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function Navbar() {
 
   return (
     <nav style={{ background: 'white', borderBottom: '2px solid #e8002d', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: lang === 'ar' ? 'row' : 'row-reverse' }}>
 
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -53,7 +53,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: lang === 'ar' ? 'row-reverse' : 'row' }}>
           {!isMobile && (
             <>
               <Link to="/" style={navLinkStyle('/')}>{t('footerHome')}</Link>
