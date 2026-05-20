@@ -21,7 +21,6 @@ body {
   font-family: 'Cairo', sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  direction: rtl;
 }
 
 #root {
