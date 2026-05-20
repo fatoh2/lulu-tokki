@@ -1,4 +1,7 @@
+import { useLanguage } from '../context/LanguageContext';
+
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  const { isRTL } = useLanguage();
   if (totalPages <= 1) return null;
 
   const getPages = () => {
@@ -34,15 +37,18 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     </button>
   );
 
+  const prevArrow = isRTL ? '→' : '←';
+  const nextArrow = isRTL ? '←' : '→';
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '32px 0 8px', flexWrap: 'wrap' }}>
-      {btn('→', currentPage - 1, false, currentPage === 1)}
+      {btn(prevArrow, currentPage - 1, false, currentPage === 1)}
       {getPages().map((p, i) =>
         p === '…'
           ? <span key={`ellipsis-${i}`} style={{ color: '#9ca3af', padding: '0 4px', fontWeight: 700 }}>…</span>
           : btn(p, p, p === currentPage)
       )}
-      {btn('←', currentPage + 1, false, currentPage === totalPages)}
+      {btn(nextArrow, currentPage + 1, false, currentPage === totalPages)}
     </div>
   );
 }

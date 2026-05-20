@@ -1,22 +1,20 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
+import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
 
 const CATEGORIES = ['الكل', 'رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت'];
-const SORT_OPTIONS = [
-  { value: 'featured', label: 'المميزة أولاً' },
-  { value: 'price-asc', label: 'السعر: الأقل أولاً' },
-  { value: 'price-desc', label: 'السعر: الأعلى أولاً' },
-  { value: 'rating', label: 'الأعلى تقييماً' },
-  { value: 'name', label: 'الاسم أبجدياً' },
-];
 const PAGE_SIZE = 20;
 
 export default function Catalog() {
   const { products } = useProducts();
+  const { t, lang, isRTL } = useLanguage();
+  const location = useLocation();
+
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('الكل');
+  const [category, setCategory] = useState(location.state?.category || 'الكل');
   const [maxPrice, setMaxPrice] = useState(null);
   const [onlyInStock, setOnlyInStock] = useState(false);
   const [minRating, setMinRating] = useState(0);
@@ -24,10 +22,22 @@ export default function Catalog() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [page, setPage] = useState(1);
 
+  const sortOptions = [
+    { value: 'featured', label: t('sortFeatured') },
+    { value: 'price-asc', label: t('sortPriceAsc') },
+    { value: 'price-desc', label: t('sortPriceDesc') },
+    { value: 'rating', label: t('sortRating') },
+    { value: 'name', label: t('sortName') },
+  ];
+
+  const catLabel = (cat) => ({
+    'الكل': t('catAll'), 'رامن': t('catRamen'), 'رقائق': t('catChips'),
+    'حلوى': t('catCandy'), 'مشروبات': t('catDrinks'), 'بسكويت': t('catBiscuits'),
+  })[cat] ?? cat;
+
   const maxPriceInData = Math.ceil(Math.max(...products.map(p => p.price))) + 1;
   const effectiveMax = maxPrice ?? maxPriceInData;
 
-  // Reset to page 1 whenever filters change
   useEffect(() => { setPage(1); }, [search, category, maxPrice, onlyInStock, minRating, sort]);
 
   const filtered = useMemo(() => {
@@ -74,7 +84,7 @@ export default function Catalog() {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px' }}>
 
-      {/* Hero Banner */}
+      {/* Hero */}
       <div style={{
         background: 'linear-gradient(135deg, #e8002d 0%, #b5001f 50%, #003478 100%)',
         borderRadius: 20, padding: '32px 40px', marginBottom: 32,
@@ -83,13 +93,13 @@ export default function Catalog() {
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, marginBottom: 6 }}>
-            🇰🇷 أفضل المنتجات الكورية الأصيلة
+            {t('catalogHeroBadge')}
           </div>
           <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>
-            وجبات كورية في بيتك
+            {t('catalogHeroTitle')}
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.85)', margin: '8px 0 0', fontSize: 15 }}>
-            {products.length}+ منتج أصيل يصلك على باب البيت
+            {products.length}{t('catalogHeroSubtitle')}
           </p>
         </div>
         <div style={{ fontSize: 80, opacity: 0.9 }}>🍜</div>
@@ -99,16 +109,18 @@ export default function Catalog() {
 
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: 20 }}>
-        <span style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 18, pointerEvents: 'none' }}>🔍</span>
+        <span style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 18, pointerEvents: 'none' }}>🔍</span>
         <input
-          type="text" placeholder="ابحث عن منتج، علامة تجارية..."
-          value={search} onChange={e => setSearch(e.target.value)}
-          style={{ width: '100%', padding: '14px 50px 14px 20px', borderRadius: 12, border: '2px solid #e5e7eb', fontSize: 15, fontFamily: 'Cairo, sans-serif', outline: 'none', transition: 'border-color 0.2s', boxSizing: 'border-box' }}
+          type="text"
+          placeholder={t('searchPlaceholder')}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: '100%', padding: isRTL ? '14px 50px 14px 20px' : '14px 20px 14px 50px', borderRadius: 12, border: '2px solid #e5e7eb', fontSize: 15, fontFamily: 'Cairo, sans-serif', outline: 'none', transition: 'border-color 0.2s', boxSizing: 'border-box' }}
           onFocus={e => e.target.style.borderColor = '#e8002d'}
           onBlur={e => e.target.style.borderColor = '#e5e7eb'}
         />
         {search && (
-          <button onClick={() => setSearch('')} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' }}>×</button>
+          <button onClick={() => setSearch('')} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 16, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' }}>×</button>
         )}
       </div>
 
@@ -121,19 +133,19 @@ export default function Catalog() {
             background: category === cat ? '#e8002d' : 'white',
             color: category === cat ? 'white' : '#374151',
             fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.2s',
-          }}>{cat}</button>
+          }}>{catLabel(cat)}</button>
         ))}
       </div>
 
       {/* Toolbar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <div style={{ color: '#6b7280', fontSize: 14, fontWeight: 600 }}>
-          {filtered.length === 0 ? 'لا توجد نتائج' : (
+          {filtered.length === 0 ? t('noResultsTitle') : (
             <>
-              <span style={{ color: '#1a1a2e', fontWeight: 800 }}>{filtered.length}</span> منتج
+              <span style={{ color: '#1a1a2e', fontWeight: 800 }}>{filtered.length}</span> {t('productsLabel')}
               {totalPages > 1 && (
-                <span style={{ marginRight: 8, color: '#9ca3af' }}>
-                  — صفحة {page} من {totalPages}
+                <span style={{ [isRTL ? 'marginRight' : 'marginLeft']: 8, color: '#9ca3af' }}>
+                  — {t('pageLabel')} {page} {t('ofLabel')} {totalPages}
                 </span>
               )}
             </>
@@ -150,7 +162,7 @@ export default function Catalog() {
               fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer',
             }}
           >
-            <span>⚙️ فلاتر</span>
+            <span>{t('filterBtn')}</span>
             {activeFiltersCount > 0 && (
               <span style={{ background: '#e8002d', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
                 {activeFiltersCount}
@@ -158,7 +170,7 @@ export default function Catalog() {
             )}
           </button>
           <select value={sort} onChange={e => setSort(e.target.value)} style={{ padding: '8px 16px', borderRadius: 10, border: '2px solid #e5e7eb', fontFamily: 'Cairo, sans-serif', fontWeight: 600, fontSize: 14, cursor: 'pointer', background: 'white', color: '#374151', outline: 'none' }}>
-            {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {sortOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
       </div>
@@ -169,7 +181,7 @@ export default function Catalog() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
             <div>
               <label style={{ fontWeight: 700, fontSize: 14, color: '#374151', display: 'block', marginBottom: 10 }}>
-                الحد الأقصى للسعر: <span style={{ color: '#e8002d' }}>{effectiveMax} ر.س</span>
+                {t('maxPriceLabel')}: <span style={{ color: '#e8002d' }}>{effectiveMax} {t('currency')}</span>
               </label>
               <input type="range" min={5} max={maxPriceInData} step={0.5}
                 value={effectiveMax}
@@ -177,11 +189,11 @@ export default function Catalog() {
                 style={{ width: '100%' }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#9ca3af', marginTop: 4 }}>
-                <span>5 ر.س</span><span>{maxPriceInData} ر.س</span>
+                <span>5 {t('currency')}</span><span>{maxPriceInData} {t('currency')}</span>
               </div>
             </div>
             <div>
-              <label style={{ fontWeight: 700, fontSize: 14, color: '#374151', display: 'block', marginBottom: 10 }}>الحد الأدنى للتقييم</label>
+              <label style={{ fontWeight: 700, fontSize: 14, color: '#374151', display: 'block', marginBottom: 10 }}>{t('minRatingLabel')}</label>
               <div style={{ display: 'flex', gap: 8 }}>
                 {[0, 3, 3.5, 4, 4.5].map(r => (
                   <button key={r} onClick={() => setMinRating(r)} style={{
@@ -190,7 +202,7 @@ export default function Catalog() {
                     background: minRating === r ? '#fffbeb' : 'white',
                     color: minRating === r ? '#d97706' : '#6b7280',
                     fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                  }}>{r === 0 ? 'الكل' : `${r}★`}</button>
+                  }}>{r === 0 ? t('catAll') : `${r}★`}</button>
                 ))}
               </div>
             </div>
@@ -199,14 +211,14 @@ export default function Catalog() {
                 <div onClick={() => setOnlyInStock(!onlyInStock)} style={{ width: 48, height: 26, borderRadius: 13, cursor: 'pointer', background: onlyInStock ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: onlyInStock ? 4 : 24, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
                 </div>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#374151' }}>المتاح فقط</span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#374151' }}>{t('inStockOnly')}</span>
               </label>
             </div>
           </div>
           {activeFiltersCount > 0 && (
             <div style={{ marginTop: 20, borderTop: '1px solid #f3f4f6', paddingTop: 16 }}>
               <button onClick={resetFilters} style={{ padding: '8px 20px', borderRadius: 10, border: '2px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                ↺ إعادة ضبط الفلاتر
+                {t('resetFilters')}
               </button>
             </div>
           )}
@@ -217,8 +229,8 @@ export default function Catalog() {
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
           <div style={{ fontSize: 60, marginBottom: 16 }}>🔍</div>
-          <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>لا توجد منتجات مطابقة</div>
-          <div style={{ fontSize: 14 }}>جرب تغيير الفلاتر أو البحث بكلمات مختلفة</div>
+          <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{t('noResultsTitle')}</div>
+          <div style={{ fontSize: 14 }}>{t('noResultsDesc')}</div>
         </div>
       ) : (
         <>
@@ -228,7 +240,7 @@ export default function Catalog() {
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={p => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           {totalPages > 1 && (
             <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 13, marginTop: 4 }}>
-              عرض {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} من {filtered.length} منتج
+              {lang === 'ar' ? 'عرض' : 'Showing'} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} {t('ofLabel')} {filtered.length} {t('productsLabel')}
             </div>
           )}
         </>
