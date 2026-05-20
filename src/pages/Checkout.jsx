@@ -137,19 +137,24 @@ export default function Checkout() {
           `✅ Total: ₪${total.toFixed(2)}`,
         ].filter(line => line !== '').join('\n');
 
-    if (user) {
-      try {
-        await addDoc(collection(db, 'orders'), {
-          userId: user.id,
-          date: new Date().toISOString(),
-          items: items.map(({ id, name, emoji, price, quantity }) => ({ id, name, emoji, price, quantity })),
-          subtotal: totalPrice,
-          shipping,
-          total,
-        });
-      } catch (e) {
-        console.error('Failed to save order', e);
-      }
+    try {
+      await addDoc(collection(db, 'orders'), {
+        userId: user?.id || null,
+        customerName: form.name,
+        phone: form.phone,
+        address: { city: form.city, district: form.district, street: form.street, building: form.building },
+        notes: form.notes || '',
+        items: items.map(({ id, name, emoji, price, quantity, variant }) => ({ id, name, emoji, price, quantity, variant: variant?.label || null })),
+        subtotal: totalPrice,
+        discount: discountAmt,
+        promoCode: appliedPromo?.code || null,
+        shipping,
+        total,
+        status: 'pending',
+        date: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error('Failed to save order', e);
     }
 
     window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');

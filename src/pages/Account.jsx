@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useProducts } from '../context/ProductsContext';
+import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
+import toast from 'react-hot-toast';
 
 export default function Account() {
   const { user, logout } = useAuth();
-  const { t, lang } = useLanguage();
+  const { t, lang, isRTL } = useLanguage();
   const { wishlist } = useWishlist();
   const { products } = useProducts();
+  const { addItem, updateQty } = useCart();
   const navigate = useNavigate();
   const [tab, setTab] = useState('history');
   const [orders, setOrders] = useState([]);
@@ -47,6 +50,29 @@ export default function Account() {
   }
 
   const wishlistProducts = products.filter(p => wishlist.includes(p.id));
+
+  const handleReorder = (order) => {
+    let added = 0;
+    order.items.forEach(item => {
+      const product = products.find(p => p.id === item.id);
+      if (!product || !product.inStock) return;
+      addItem(product);
+      if (item.quantity > 1) updateQty(product.id, item.quantity);
+      added++;
+    });
+    if (added > 0) {
+      toast.success(
+        lang === 'ar' ? `✅ تمت إضافة ${added} منتج للسلة!` : `✅ ${added} item${added > 1 ? 's' : ''} added to cart!`,
+        { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr', fontWeight: 600 } }
+      );
+      navigate('/cart');
+    } else {
+      toast.error(
+        lang === 'ar' ? 'المنتجات غير متاحة حالياً' : 'Products are currently unavailable',
+        { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr' } }
+      );
+    }
+  };
 
   const tabStyle = (active) => ({
     padding: '10px 22px', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700,
@@ -125,8 +151,16 @@ export default function Account() {
                     </div>
                   ))}
                 </div>
-                <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
                   <span style={{ fontWeight: 800, fontSize: 16, color: '#e8002d' }}>{t('totalLabel')}: {order.total.toFixed(2)} {t('currency')}</span>
+                  <button
+                    onClick={() => handleReorder(order)}
+                    style={{ padding: '8px 20px', borderRadius: 10, border: '2px solid #e8002d', background: 'white', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#e8002d'; }}
+                  >
+                    {lang === 'ar' ? '🔄 إعادة الطلب' : '🔄 Reorder'}
+                  </button>
                 </div>
               </div>
             ))}

@@ -6,6 +6,7 @@ import { useProducts } from '../context/ProductsContext';
 import toast from 'react-hot-toast';
 
 const CATEGORIES = ['رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت'];
+
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'رامن',
   emoji: '🍜', brand: '', weight: '', servings: '',
@@ -54,6 +55,11 @@ export default function Admin() {
   const [codeErrors, setCodeErrors] = useState({});
   const [editingCode, setEditingCode] = useState(null);
   const [confirmDeleteCode, setConfirmDeleteCode] = useState(null);
+
+  // ── Analytics orders state ──
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersLoaded, setOrdersLoaded] = useState(false);
 
   useEffect(() => {
     setCodesLoading(true);
@@ -125,6 +131,21 @@ export default function Admin() {
     toast.success('تم إضافة الأكواد الافتراضية ✅', {
       style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
     });
+  };
+
+  const loadOrders = async () => {
+    if (ordersLoaded) return;
+    setOrdersLoading(true);
+    try {
+      const snap = await getDocs(collection(db, 'orders'));
+      const arr = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      arr.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setOrders(arr);
+      setOrdersLoaded(true);
+    } finally {
+      setOrdersLoading(false);
+    }
   };
 
   const handleImageSelect = (e) => {
@@ -242,6 +263,25 @@ export default function Admin() {
     });
   };
 
+  // ── Analytics computations ──
+  const aRevenue = orders.reduce((s, o) => s + (o.total || 0), 0);
+  const aAvg = orders.length ? aRevenue / orders.length : 0;
+  const aCustomers = new Set(orders.map(o => o.phone || o.userId).filter(Boolean)).size;
+  const aProdMap = {};
+  orders.forEach(o => (o.items || []).forEach(item => {
+    if (!aProdMap[item.id]) aProdMap[item.id] = { name: item.name, emoji: item.emoji || '🛍️', qty: 0, revenue: 0 };
+    aProdMap[item.id].qty += item.quantity || 1;
+    aProdMap[item.id].revenue += (item.price || 0) * (item.quantity || 1);
+  }));
+  const aTopProducts = Object.values(aProdMap).sort((a, b) => b.qty - a.qty).slice(0, 5);
+  const aCatMap = {};
+  orders.forEach(o => (o.items || []).forEach(item => {
+    const prod = products.find(pr => pr.id === item.id);
+    const cat = prod?.category || 'أخرى';
+    aCatMap[cat] = (aCatMap[cat] || 0) + (item.quantity || 1);
+  }));
+  const aCatTotal = Object.values(aCatMap).reduce((s, v) => s + v, 0) || 1;
+
   const inputStyle = (hasError) => ({
     width: '100%', padding: '10px 12px', borderRadius: 10,
     border: `2px solid ${hasError ? '#e8002d' : '#e5e7eb'}`,
@@ -285,8 +325,8 @@ export default function Admin() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'white', borderRadius: 12, padding: 4, border: '1px solid #e5e7eb', width: 'fit-content' }}>
-        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم']].map(([key, label]) => (
-          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } }} style={{
+        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم'], ['analytics', '📊 الإحصاءات']].map(([key, label]) => (
+          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } if (key === 'analytics') { loadOrders(); } }} style={{
             padding: '8px 24px', borderRadius: 9, border: 'none',
             background: tab === key ? '#e8002d' : 'transparent',
             color: tab === key ? 'white' : '#6b7280',
@@ -755,6 +795,73 @@ export default function Admin() {
                 {promoCodes.length} كود — {promoCodes.filter(c => c.active).length} فعّال
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Analytics Tab ── */}
+      {tab === 'analytics' && (
+        <div>
+          {ordersLoading && <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 15 }}>⏳ جاري تحميل البيانات...</div>}
+          {!ordersLoading && !ordersLoaded && <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 15 }}>لا توجد بيانات</div>}
+          {ordersLoaded && (
+            <>
+              {/* Summary cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
+                {[
+                  { icon: '💰', label: 'إجمالي الإيرادات', value: `${aRevenue.toFixed(2)} ₪`, color: '#e8002d', bg: '#fff0f2' },
+                  { icon: '📦', label: 'إجمالي الطلبات', value: orders.length, color: '#003478', bg: '#eff6ff' },
+                  { icon: '📊', label: 'متوسط قيمة الطلب', value: `${aAvg.toFixed(2)} ₪`, color: '#7c3aed', bg: '#f5f3ff' },
+                  { icon: '👥', label: 'العملاء الفريدون', value: aCustomers, color: '#16a34a', bg: '#f0fdf4' },
+                ].map(({ icon, label, value, color, bg }) => (
+                  <div key={label} style={{ background: 'white', borderRadius: 16, padding: '20px 22px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', border: `1px solid ${bg}` }}>
+                    <div style={{ width: 42, height: 42, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 12 }}>{icon}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+
+                {/* Top 5 products */}
+                <div style={{ background: 'white', borderRadius: 16, padding: 22, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', marginTop: 0, marginBottom: 18 }}>🏆 أكثر 5 منتجات مبيعاً</h3>
+                  {aTopProducts.length === 0 ? (
+                    <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات بعد</div>
+                  ) : aTopProducts.map((p, i) => (
+                    <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < aTopProducts.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                      <div style={{ width: 26, height: 26, borderRadius: 8, background: i === 0 ? '#fffbeb' : '#f8f9fb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: i === 0 ? '#d97706' : '#9ca3af', flexShrink: 0 }}>{i + 1}</div>
+                      <span style={{ fontSize: 22, flexShrink: 0 }}>{p.emoji}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{p.revenue.toFixed(2)} ₪</div>
+                      </div>
+                      <Badge color="#e8002d" bg="#fff0f2">{p.qty} قطعة</Badge>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Orders by category */}
+                <div style={{ background: 'white', borderRadius: 16, padding: 22, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                  <h3 style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', marginTop: 0, marginBottom: 18 }}>📂 الطلبات حسب الفئة</h3>
+                  {Object.keys(aCatMap).length === 0 ? (
+                    <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات بعد</div>
+                  ) : Object.entries(aCatMap).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
+                    <div key={cat} style={{ marginBottom: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 5 }}>
+                        <span>{cat}</span>
+                        <span style={{ color: '#e8002d' }}>{count} قطعة</span>
+                      </div>
+                      <div style={{ height: 8, borderRadius: 4, background: '#f3f4f6', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg, #e8002d, #ff6b6b)', width: `${(count / aCatTotal) * 100}%`, transition: 'width 0.5s' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            </>
           )}
         </div>
       )}
