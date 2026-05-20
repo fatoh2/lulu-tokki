@@ -14,7 +14,7 @@ function useIsMobile() {
   return isMobile;
 }
 
-const HERO_PHOTO = 'https://plus.unsplash.com/premium_photo-1700830647950-6bba9ca2a957?fm=jpg&q=80&w=600&h=500&auto=format&fit=crop';
+const HERO_BG = 'https://images.unsplash.com/photo-1744870132190-5c02d3f8d9f9?w=1600&q=80&auto=format&fit=crop';
 
 const CATEGORIES = [
   { key: 'رامن', emoji: '🍜', tKey: 'catRamen' },
@@ -44,74 +44,59 @@ export default function Home() {
     <div>
       {/* ── Hero ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #e8002d 0%, #9b001e 45%, #003478 100%)',
+        backgroundImage: `linear-gradient(135deg, rgba(232,0,45,0.82) 0%, rgba(155,0,30,0.75) 45%, rgba(0,52,120,0.82) 100%), url(${HERO_BG})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: 520,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: isMobile ? '56px 20px' : '64px 40px',
+        textAlign: 'center',
+        padding: '72px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Decorative blobs */}
-        <div style={{ position: 'absolute', top: -100, right: -100, width: 360, height: 360, background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }} />
-        <div style={{ position: 'absolute', bottom: -120, left: -60, width: 440, height: 440, background: 'rgba(255,255,255,0.04)', borderRadius: '50%' }} />
-
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1200, width: '100%', display: 'flex', alignItems: 'center', gap: 48, flexDirection: isMobile ? 'column' : 'row' }}>
-
-          {/* Text side */}
-          <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'start' }}>
-            <div style={{ fontSize: 56, marginBottom: 16, lineHeight: 1 }}>🇰🇷</div>
-            <h1 style={{ color: 'white', fontSize: isMobile ? 30 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
-              {t('heroTitle')}
-            </h1>
-            <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: 16, lineHeight: 1.75, marginBottom: 36, maxWidth: 480 }}>
-              {t('heroSubtitle')}
-            </p>
-            <div style={{ display: 'flex', gap: 14, justifyContent: isMobile ? 'center' : 'start', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => navigate('/store')}
-                style={{ padding: '14px 38px', borderRadius: 14, background: 'white', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', transition: 'transform 0.15s, box-shadow 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.2)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)'; }}
-              >
-                {t('heroShopNow')} ←
-              </button>
-              <button
-                onClick={() => navigate('/store')}
-                style={{ padding: '14px 38px', borderRadius: 14, background: 'transparent', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 16, cursor: 'pointer', border: '2px solid rgba(255,255,255,0.55)', transition: 'background 0.2s, border-color 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.55)'; }}
-              >
-                {t('heroBrowse')}
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div style={{ display: 'flex', gap: 32, justifyContent: isMobile ? 'center' : 'start', marginTop: 44, flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: 32 }}>
-              {[
-                { num: `${products.length}+`, label: t('heroStatProducts') },
-                { num: '5', label: t('heroStatCategories') },
-                { num: '100%', label: t('heroStatAuthentic') },
-                { num: '⚡', label: t('heroStatDelivery') },
-              ].map(stat => (
-                <div key={stat.label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: 'white', lineHeight: 1 }}>{stat.num}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 4 }}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
+          <div style={{ fontSize: 64, marginBottom: 18, lineHeight: 1 }}>🇰🇷</div>
+          <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
+            {t('heroTitle')}
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 17, lineHeight: 1.75, marginBottom: 40, maxWidth: 560, marginInline: 'auto' }}>
+            {t('heroSubtitle')}
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => navigate('/store')}
+              style={{ padding: '14px 38px', borderRadius: 14, background: 'white', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.28)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)'; }}
+            >
+              {t('heroShopNow')} ←
+            </button>
+            <button
+              onClick={() => navigate('/store')}
+              style={{ padding: '14px 38px', borderRadius: 14, background: 'transparent', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 16, cursor: 'pointer', border: '2px solid rgba(255,255,255,0.6)', transition: 'background 0.2s, border-color 0.2s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'white'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; }}
+            >
+              {t('heroBrowse')}
+            </button>
           </div>
 
-          {/* Photo side */}
-          {!isMobile && (
-            <div style={{ flexShrink: 0, width: 440 }}>
-              <img
-                src={HERO_PHOTO}
-                alt="Korean snacks"
-                style={{ width: '100%', height: 420, objectFit: 'cover', borderRadius: 24, boxShadow: '0 24px 64px rgba(0,0,0,0.35)', display: 'block' }}
-              />
-            </div>
-          )}
+          {/* Stats */}
+          <div style={{ display: 'flex', gap: 36, justifyContent: 'center', marginTop: 52, flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 36 }}>
+            {[
+              { num: `${products.length}+`, label: t('heroStatProducts') },
+              { num: '5', label: t('heroStatCategories') },
+              { num: '100%', label: t('heroStatAuthentic') },
+              { num: '⚡', label: t('heroStatDelivery') },
+            ].map(stat => (
+              <div key={stat.label} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: 'white', lineHeight: 1 }}>{stat.num}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 4 }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
