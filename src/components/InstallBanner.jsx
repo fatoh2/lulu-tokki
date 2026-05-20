@@ -14,7 +14,8 @@ export default function InstallBanner() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  if (!prompt || dismissed) return null;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (!prompt || dismissed || !isMobile) return null;
 
   const handleInstall = async () => {
     prompt.prompt();
