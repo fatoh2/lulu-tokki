@@ -59,6 +59,14 @@ export function ProductsProvider({ children }) {
     setProducts(prev => prev.filter(p => p.id !== id));
   }, []);
 
+  const updateProduct = useCallback(async (id, data) => {
+    const existing = products.find(p => p.id === id);
+    const updated = { ...existing, ...data };
+    await setDoc(doc(db, 'products', String(id)), updated);
+    setProducts(prev => prev.map(p => p.id === id ? updated : p));
+    return updated;
+  }, [products]);
+
   const seedProducts = useCallback(async () => {
     const batch = writeBatch(db);
     baseProducts.forEach(p => batch.set(doc(db, 'products', String(p.id)), p));
@@ -67,7 +75,7 @@ export function ProductsProvider({ children }) {
   }, []);
 
   return (
-    <ProductsContext.Provider value={{ products, loading, addProduct, removeProduct, seedProducts }}>
+    <ProductsContext.Provider value={{ products, loading, addProduct, removeProduct, updateProduct, seedProducts }}>
       {children}
     </ProductsContext.Provider>
   );

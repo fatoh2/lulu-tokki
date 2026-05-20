@@ -32,12 +32,13 @@ function Field({ label, required, error, children }) {
 }
 
 export default function Admin() {
-  const { products, addProduct, removeProduct, seedProducts } = useProducts();
+  const { products, addProduct, removeProduct, updateProduct, seedProducts } = useProducts();
   const [tab, setTab] = useState('list'); // 'list' | 'add'
   const [search, setSearch] = useState('');
   const [confirmId, setConfirmId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
+  const [editingId, setEditingId] = useState(null);
   const [seeding, setSeeding] = useState(false);
   const [seeded, setSeeded] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -60,6 +61,27 @@ export default function Admin() {
     } finally {
       setSeeding(false);
     }
+  };
+
+  const startEdit = (p) => {
+    setEditingId(p.id);
+    setForm({
+      name: p.name,
+      description: p.description,
+      price: String(p.price),
+      category: p.category,
+      emoji: p.emoji,
+      brand: p.brand,
+      weight: p.weight ?? '',
+      servings: p.servings ?? '',
+      heat: p.heat ?? 0,
+      inStock: p.inStock ?? true,
+      tags: (p.tags ?? []).join(', '),
+    });
+    setImagePreview(p.imageUrl ?? '');
+    setImageFile(null);
+    setErrors({});
+    setTab('add');
   };
 
   const filtered = products.filter(p =>
@@ -90,27 +112,35 @@ export default function Admin() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setSubmitting(true);
     try {
-      let imageUrl = '';
+      let imageUrl = imagePreview && !imageFile ? imagePreview : '';
       if (imageFile) {
-        const maxId = products.reduce((max, p) => Math.max(max, p.id), 0);
-        const newId = maxId + 1;
-        const imgRef = storageRef(storage, `product-images/${newId}`);
+        const targetId = editingId ?? (products.reduce((max, p) => Math.max(max, p.id), 0) + 1);
+        const imgRef = storageRef(storage, `product-images/${targetId}`);
         await uploadBytes(imgRef, imageFile);
         imageUrl = await getDownloadURL(imgRef);
       }
-      await addProduct({
+      const data = {
         ...form,
         price: Number(form.price),
         heat: Number(form.heat),
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         ...(imageUrl ? { imageUrl } : {}),
-      });
-      toast.success(`تم إضافة "${form.name}" بنجاح! ✅`, {
-        style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
-      });
+      };
+      if (editingId) {
+        await updateProduct(editingId, data);
+        toast.success(`تم تحديث "${form.name}" ✅`, {
+          style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+        });
+      } else {
+        await addProduct(data);
+        toast.success(`تم إضافة "${form.name}" بنجاح! ✅`, {
+          style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
+        });
+      }
       setForm(EMPTY_FORM);
       setImageFile(null);
       setImagePreview('');
+      setEditingId(null);
       setTab('list');
     } finally {
       setSubmitting(false);
@@ -169,8 +199,8 @@ export default function Admin() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'white', borderRadius: 12, padding: 4, border: '1px solid #e5e7eb', width: 'fit-content' }}>
-        {[['list', '📋 المنتجات'], ['add', '➕ إضافة منتج']].map(([key, label]) => (
-          <button key={key} onClick={() => setTab(key)} style={{
+        {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج']].map(([key, label]) => (
+          <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } }} style={{
             padding: '8px 24px', borderRadius: 9, border: 'none',
             background: tab === key ? '#e8002d' : 'transparent',
             color: tab === key ? 'white' : '#6b7280',
@@ -249,19 +279,27 @@ export default function Admin() {
                     : <Badge color="#6b7280" bg="#f3f4f6">❌ نفد</Badge>
                   }
                 </div>
-                <div>
+                <div style={{ display: 'flex', gap: 4 }}>
                   {confirmId === p.id ? (
-                    <div style={{ display: 'flex', gap: 4 }}>
+                    <>
                       <button onClick={() => handleRemove(p.id)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
                       <button onClick={() => setConfirmId(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>إلغاء</button>
-                    </div>
+                    </>
                   ) : (
-                    <button
-                      onClick={() => setConfirmId(p.id)}
-                      style={{ padding: '6px 12px', borderRadius: 8, border: '2px solid #fee2e2', background: '#fff5f5', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; e.currentTarget.style.color = '#e8002d'; }}
-                    >🗑 حذف</button>
+                    <>
+                      <button
+                        onClick={() => startEdit(p)}
+                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: '#003478', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#003478'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = '#003478'; }}
+                      >✏️</button>
+                      <button
+                        onClick={() => setConfirmId(p.id)}
+                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: '#fff5f5', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; e.currentTarget.style.color = '#e8002d'; }}
+                      >🗑️</button>
+                    </>
                   )}
                 </div>
               </div>
@@ -279,7 +317,7 @@ export default function Admin() {
         <form onSubmit={handleAdd}>
           <div style={{ background: 'white', borderRadius: 20, padding: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
             <h3 style={{ fontWeight: 800, fontSize: 17, color: '#1a1a2e', marginTop: 0, marginBottom: 24, paddingBottom: 12, borderBottom: '2px solid #f3f4f6' }}>
-              ➕ إضافة منتج جديد
+              {editingId ? '✏️ تعديل المنتج' : '➕ إضافة منتج جديد'}
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -460,9 +498,9 @@ export default function Admin() {
                 onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = '#b5001f'; }}
                 onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = '#e8002d'; }}
               >
-                {submitting ? (imageFile ? '⏳ جاري رفع الصورة...' : '⏳ جاري الحفظ...') : '✅ إضافة المنتج للمتجر'}
+                {submitting ? (imageFile ? '⏳ جاري رفع الصورة...' : '⏳ جاري الحفظ...') : editingId ? '💾 حفظ التعديلات' : '✅ إضافة المنتج للمتجر'}
               </button>
-              <button type="button" onClick={() => { setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); }}
+              <button type="button" onClick={() => { setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); setEditingId(null); }}
                 style={{ padding: '13px 24px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
               >
                 مسح النموذج
