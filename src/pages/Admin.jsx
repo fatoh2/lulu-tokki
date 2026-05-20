@@ -17,6 +17,18 @@ function Badge({ children, color = '#e8002d', bg = '#fff0f2' }) {
   );
 }
 
+function Field({ label, required, error, children }) {
+  return (
+    <div>
+      <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>
+        {label}{required && <span style={{ color: '#e8002d' }}> *</span>}
+      </label>
+      {children}
+      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {error}</div>}
+    </div>
+  );
+}
+
 export default function Admin() {
   const { products, addProduct, removeProduct } = useProducts();
   const [tab, setTab] = useState('list'); // 'list' | 'add'
@@ -47,11 +59,11 @@ export default function Admin() {
     return e;
   };
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    addProduct({
+    await addProduct({
       ...form,
       price: Number(form.price),
       heat: Number(form.heat),
@@ -64,9 +76,9 @@ export default function Admin() {
     setTab('list');
   };
 
-  const handleRemove = (id) => {
+  const handleRemove = async (id) => {
     const p = products.find(p => p.id === id);
-    removeProduct(id);
+    await removeProduct(id);
     setConfirmId(null);
     toast.success(`تم حذف "${p?.name}" ✅`, {
       style: { fontFamily: 'Cairo, sans-serif', direction: 'rtl', fontWeight: 600 },
@@ -80,16 +92,6 @@ export default function Admin() {
     outline: 'none', boxSizing: 'border-box', background: 'white',
     transition: 'border-color 0.2s',
   });
-
-  const Field = ({ label, id, required, error, children }) => (
-    <div>
-      <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>
-        {label}{required && <span style={{ color: '#e8002d' }}> *</span>}
-      </label>
-      {children}
-      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {error}</div>}
-    </div>
-  );
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 20px' }}>

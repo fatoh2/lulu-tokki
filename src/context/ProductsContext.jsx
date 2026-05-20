@@ -1,67 +1,58 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { collection, getDocs, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { db } from '../firebase';
 import baseProducts from '../data/products.json';
 
 const ProductsContext = createContext(null);
 
-function load(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key) ?? 'null') ?? fallback; }
-  catch { return fallback; }
-}
-
-function save(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
 export function ProductsProvider({ children }) {
-  const [added, setAdded] = useState(() => load('hanook_added', []));
-  const [removedIds, setRemovedIds] = useState(() => load('hanook_removed', []));
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const products = [
-    ...baseProducts.filter(p => !removedIds.includes(p.id)),
-    ...added.filter(p => !removedIds.includes(p.id)),
-  ];
-
-  const addProduct = useCallback((data) => {
-    setAdded(prev => {
-      const maxId = Math.max(
-        ...baseProducts.map(p => p.id),
-        ...prev.map(p => p.id),
-        100
-      );
-      const next = [...prev, {
-        ...data,
-        id: maxId + 1,
-        origin: 'كوريا الجنوبية',
-        isNew: true,
-        isFeatured: false,
-        rating: 0,
-        reviews: 0,
-        longDescription: data.description,
-        tags: data.tags ?? [],
-      }];
-      save('hanook_added', next);
-      return next;
-    });
+  useEffect(() => {
+    async function load() {
+      const snap = await getDocs(collection(db, 'products'));
+      if (snap.empty) {
+        // First run — seed from local JSON
+        const batch = writeBatch(db);
+        baseProducts.forEach(p => batch.set(doc(db, 'products', String(p.id)), p));
+        await batch.commit();
+        setProducts([...baseProducts].sort((a, b) => a.id - b.id));
+      } else {
+        const docs = snap.docs.map(d => d.data()).sort((a, b) => a.id - b.id);
+        setProducts(docs);
+      }
+      setLoading(false);
+    }
+    load();
   }, []);
 
-  const removeProduct = useCallback((id) => {
-    setRemovedIds(prev => {
-      const next = [...prev, id];
-      save('hanook_removed', next);
-      return next;
-    });
-  }, []);
+  const addProduct = useCallback(async (data) => {
+    const maxId = products.reduce((max, p) => Math.max(max, p.id), 0);
+    const newId = maxId + 1;
+    const product = {
+      ...data,
+      id: newId,
+      origin: 'كوريا الجنوبية',
+      isNew: true,
+      isFeatured: false,
+      rating: 0,
+      reviews: 0,
+      longDescription: data.description,
+      tags: data.tags ?? [],
+    };
+    await setDoc(doc(db, 'products', String(newId)), product);
+    setProducts(prev => [...prev, product]);
+    return product;
+  }, [products]);
 
-  const restoreProduct = useCallback((id) => {
-    setRemovedIds(prev => {
-      const next = prev.filter(rid => rid !== id);
-      save('hanook_removed', next);
-      return next;
-    });
+  const removeProduct = useCallback(async (id) => {
+    await deleteDoc(doc(db, 'products', String(id)));
+    setProducts(prev => prev.filter(p => p.id !== id));
   }, []);
 
   return (
-    <ProductsContext.Provider value={{ products, addProduct, removeProduct, restoreProduct, removedIds }}>
+    <ProductsContext.Provider value={{ products, loading, addProduct, removeProduct }}>
       {children}
     </ProductsContext.Provider>
   );
