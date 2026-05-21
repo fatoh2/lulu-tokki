@@ -147,7 +147,7 @@ const T = {
 
     footerTagline: 'أفضل الوجبات الكورية الأصيلة في قلنسوة',
     footerContactTitle: 'تواصل معنا',
-    footerEmail: 'info@hanooksnacks.com',
+    footerEmail: 'noorabutamam304@gmail.com',
     footerPhone: '+972504493660',
     footerAddress: 'قلنسوة',
     footerHours: 'الأحد – الخميس: 9 ص – 9 م',
@@ -338,7 +338,7 @@ const T = {
 
     footerTagline: 'The best authentic Korean snacks in Qalansawe',
     footerContactTitle: 'Contact Us',
-    footerEmail: 'info@hanooksnacks.com',
+    footerEmail: 'noorabutamam304@gmail.com',
     footerPhone: '+972504493660',
     footerAddress: 'Qalansawe',
     footerHours: 'Sun–Thu: 9 AM – 9 PM',

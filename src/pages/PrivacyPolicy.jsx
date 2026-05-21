@@ -74,7 +74,7 @@ export default function PrivacyPolicy() {
                 <li>طلب تصحيح أي بيانات غير دقيقة</li>
                 <li>طلب حذف بياناتك</li>
               </ul>
-              <p style={{ marginTop: 10 }}>لممارسة هذه الحقوق، تواصل معنا عبر البريد الإلكتروني: <strong>info@hanooksnacks.com</strong></p>
+              <p style={{ marginTop: 10 }}>لممارسة هذه الحقوق، تواصل معنا عبر البريد الإلكتروني: <strong>noorabutamam304@gmail.com</strong></p>
             </section>
 
             <section>
@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
               <h2 style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', marginTop: 0, marginBottom: 10 }}>7. التواصل معنا</h2>
               <p>لأي استفسارات متعلقة بالخصوصية:</p>
               <ul style={{ paddingInlineStart: 24, marginTop: 8 }}>
-                <li>البريد الإلكتروني: info@hanooksnacks.com</li>
+                <li>البريد الإلكتروني: noorabutamam304@gmail.com</li>
                 <li>الهاتف: <span dir="ltr">+972-50-449-3660</span></li>
                 <li>العنوان: قلنسوة، إسرائيل</li>
               </ul>
@@ -130,7 +130,7 @@ export default function PrivacyPolicy() {
 
             <section>
               <h2 style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', marginTop: 0, marginBottom: 10 }}>5. Your Rights</h2>
-              <p>Under Israeli Privacy Protection Law (1981), you have the right to access, correct, or delete your data. Contact us at <strong>info@hanooksnacks.com</strong>.</p>
+              <p>Under Israeli Privacy Protection Law (1981), you have the right to access, correct, or delete your data. Contact us at <strong>noorabutamam304@gmail.com</strong>.</p>
             </section>
 
             <section>

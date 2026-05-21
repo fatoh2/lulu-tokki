@@ -84,7 +84,7 @@ export default function ReturnPolicy() {
                   </a>
                   {' '}— الأسرع
                 </li>
-                <li><strong>البريد الإلكتروني:</strong> info@hanooksnacks.com</li>
+                <li><strong>البريد الإلكتروني:</strong> noorabutamam304@gmail.com</li>
               </ul>
               <p style={{ marginTop: 10 }}>يرجى ذكر <strong>رقم الطلب</strong> وسبب الإلغاء في رسالتك.</p>
             </section>
@@ -152,7 +152,7 @@ export default function ReturnPolicy() {
                   </a>
                   {' '}— Fastest
                 </li>
-                <li><strong>Email:</strong> info@hanooksnacks.com</li>
+                <li><strong>Email:</strong> noorabutamam304@gmail.com</li>
               </ul>
               <p style={{ marginTop: 10 }}>Please include your <strong>order reference</strong> and reason for cancellation.</p>
             </section>

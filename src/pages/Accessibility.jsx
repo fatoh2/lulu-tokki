@@ -82,7 +82,7 @@ export default function Accessibility() {
                 إذا واجهت أي عائق في الوصول إلى المحتوى أو الخدمات، يرجى التواصل معنا:
               </p>
               <ul style={{ paddingInlineStart: 24, marginTop: 8 }}>
-                <li>البريد الإلكتروني: <strong>info@hanooksnacks.com</strong></li>
+                <li>البريد الإلكتروني: <strong>noorabutamam304@gmail.com</strong></li>
                 <li>
                   واتساب:{' '}
                   <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
@@ -156,7 +156,7 @@ export default function Accessibility() {
               <h2 style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', marginTop: 0, marginBottom: 10 }}>5. Report an Issue</h2>
               <p>If you encounter any accessibility barrier, please contact us:</p>
               <ul style={{ paddingInlineStart: 24, marginTop: 8 }}>
-                <li>Email: <strong>info@hanooksnacks.com</strong></li>
+                <li>Email: <strong>noorabutamam304@gmail.com</strong></li>
                 <li>
                   WhatsApp:{' '}
                   <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
