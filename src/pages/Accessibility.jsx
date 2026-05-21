@@ -85,7 +85,7 @@ export default function Accessibility() {
                 <li>البريد الإلكتروني: <strong>info@hanooksnacks.com</strong></li>
                 <li>
                   واتساب:{' '}
-                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
+                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
                     +972-50-449-3660
                   </a>
                 </li>
@@ -159,7 +159,7 @@ export default function Accessibility() {
                 <li>Email: <strong>info@hanooksnacks.com</strong></li>
                 <li>
                   WhatsApp:{' '}
-                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
+                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
                     +972-50-449-3660
                   </a>
                 </li>
