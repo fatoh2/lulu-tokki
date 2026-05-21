@@ -35,6 +35,7 @@ export default function Checkout() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [submitted, setSubmitted] = useState(false);
+  const [submittedOrder, setSubmittedOrder] = useState(null); // snapshot before cart is cleared
   const [form, setForm] = useState({ name: '', phone: '', city: '', district: '', street: '', building: '', notes: '' });
   const [errors, setErrors] = useState({});
   const [promoInput, setPromoInput] = useState('');
@@ -158,6 +159,15 @@ export default function Checkout() {
     }
 
     window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');
+    setSubmittedOrder({
+      items: [...items],
+      subtotal: totalPrice,
+      discountAmt,
+      appliedPromo,
+      shipping,
+      total,
+      form: { ...form },
+    });
     setSubmitted(true);
     clearCart();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -175,27 +185,75 @@ export default function Checkout() {
     );
   }
 
-  if (submitted) {
+  if (submitted && submittedOrder) {
+    const o = submittedOrder;
+    const addressParts = [o.form.city, o.form.district, o.form.street, o.form.building].filter(Boolean).join(', ');
     return (
-      <div style={{ maxWidth: 560, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
-        <div style={{ background: 'white', borderRadius: 24, padding: 48, boxShadow: '0 8px 40px rgba(0,0,0,0.1)' }}>
-          <div style={{ fontSize: 72, marginBottom: 16 }}>📲</div>
-          <h2 style={{ fontWeight: 800, fontSize: 26, color: '#1a1a2e', marginBottom: 10 }}>{t('orderSuccessTitle')}</h2>
-          <p style={{ color: '#6b7280', fontSize: 16, lineHeight: 1.6, marginBottom: 8 }}>
+      <div style={{ maxWidth: 600, margin: '40px auto', padding: '0 20px' }}>
+        <div style={{ background: 'var(--card)', borderRadius: 24, padding: '40px 32px', boxShadow: 'var(--shadow-lg)', textAlign: 'center' }}>
+          <div style={{ fontSize: 72, marginBottom: 12 }}>📲</div>
+          <h2 style={{ fontWeight: 900, fontSize: 26, color: 'var(--text)', marginBottom: 8 }}>{t('orderSuccessTitle')}</h2>
+          <p style={{ color: 'var(--subtext)', fontSize: 16, lineHeight: 1.6, marginBottom: 6 }}>
             {lang === 'ar'
-              ? <>شكراً لك يا <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</>
-              : <>Thank you, <strong style={{ color: '#1a1a2e' }}>{form.name}</strong>!</>}
+              ? <>شكراً لك يا <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>
+              : <>Thank you, <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>}
           </p>
-          <p style={{ color: '#6b7280', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>
+          <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
             {lang === 'ar'
-              ? 'تم فتح واتساب لإرسال طلبك. سنتواصل معك لتأكيد التفاصيل. 🇰🇷'
-              : 'WhatsApp opened to send your order. We\'ll reach out to confirm the details. 🇰🇷'}
+              ? 'تم فتح واتساب لإرسال طلبك. سنتواصل معك قريباً لتأكيد التفاصيل. 🇰🇷'
+              : "WhatsApp opened to send your order. We'll reach out shortly to confirm. 🇰🇷"}
           </p>
-          <div style={{ background: '#f8f9fb', borderRadius: 12, padding: '16px 24px', marginBottom: 32 }}>
-            <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>{t('orderTotalLabel')}</div>
-            <div style={{ fontWeight: 800, fontSize: 22, color: '#e8002d' }}>{total.toFixed(2)} {t('currency')}</div>
+
+          {/* Order details card */}
+          <div style={{ background: 'var(--muted-bg)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, textAlign: isRTL ? 'right' : 'left' }}>
+            <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text)', marginBottom: 14, paddingBottom: 10, borderBottom: '2px solid var(--border)' }}>
+              {lang === 'ar' ? '🛍️ ملخص طلبك' : '🛍️ Your Order Summary'}
+            </div>
+
+            {/* Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+              {o.items.map(item => (
+                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{item.emoji} {item.name} × {item.quantity}</span>
+                  <span style={{ color: 'var(--text)', fontWeight: 700, flexShrink: 0 }}>{(item.price * item.quantity).toFixed(2)} {t('currency')}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Totals */}
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {o.discountAmt > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#16a34a' }}>
+                  <span>{t('discountLabel')} ({o.appliedPromo?.pct}%)</span>
+                  <span style={{ fontWeight: 700 }}>-{o.discountAmt.toFixed(2)} {t('currency')}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--subtext)' }}>
+                <span>{t('shippingLabel')}</span>
+                <span style={{ fontWeight: 700, color: o.shipping === 0 ? '#16a34a' : 'var(--text)' }}>
+                  {o.shipping === 0 ? t('freeLabel') : `${o.shipping.toFixed(2)} ${t('currency')}`}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: 'var(--text)', marginTop: 4 }}>
+                <span>{t('totalLabel')}</span>
+                <span style={{ color: '#e8002d' }}>{o.total.toFixed(2)} {t('currency')}</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
+                {lang === 'ar' ? '* السعر يشمل מע"מ' : '* Price includes VAT'}
+              </div>
+            </div>
+
+            {/* Delivery address */}
+            <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13, color: 'var(--subtext)' }}>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>📍 {lang === 'ar' ? 'عنوان التوصيل:' : 'Delivery to:'}</span>{' '}
+              {addressParts}
+            </div>
           </div>
-          <Link to="/store" style={{ display: 'inline-block', padding: '14px 40px', background: '#e8002d', color: 'white', textDecoration: 'none', borderRadius: 12, fontWeight: 800, fontSize: 16 }}>
+
+          <Link
+            to="/store"
+            style={{ display: 'inline-block', padding: '14px 40px', background: '#e8002d', color: 'white', textDecoration: 'none', borderRadius: 12, fontWeight: 800, fontSize: 16 }}
+          >
             {t('shopAgainBtn')}
           </Link>
         </div>
@@ -337,6 +395,9 @@ export default function Checkout() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, fontWeight: 800 }}>
                     <span style={{ color: '#1a1a2e' }}>{t('totalLabel')}</span>
                     <span style={{ color: '#e8002d' }}>{total.toFixed(2)} {t('currency')}</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
+                    {lang === 'ar' ? '* السعر يشمل מע"מ' : '* Price includes VAT'}
                   </div>
                 </div>
               </div>

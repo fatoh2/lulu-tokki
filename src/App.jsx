@@ -52,6 +52,9 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Account from './pages/Account';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ReturnPolicy from './pages/ReturnPolicy';
+import Accessibility from './pages/Accessibility';
 
 // Register service worker
 if ('serviceWorker' in navigator) {
@@ -91,6 +94,9 @@ function AppInner() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/returns" element={<ReturnPolicy />} />
+          <Route path="/accessibility" element={<Accessibility />} />
         </Routes>
       </main>
       <Footer />
