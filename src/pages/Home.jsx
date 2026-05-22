@@ -57,7 +57,7 @@ export default function Home() {
         overflow: 'hidden',
       }}>
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
-          <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
+          <div style={{ marginBottom: -10, display: 'flex', justifyContent: 'center' }}>
             <Logo size={380} />
           </div>
           <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
