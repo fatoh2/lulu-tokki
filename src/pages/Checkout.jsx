@@ -82,7 +82,7 @@ export default function Checkout() {
     const e = {};
     if (!form.name.trim()) e.name = t('nameRequired');
     if (!form.phone.trim()) e.phone = t('phoneRequired');
-    else if (!/^[0-9+\s\-]{7,15}$/.test(form.phone.trim())) e.phone = t('phoneInvalid');
+    else if (!/^[0-9+\s-]{7,15}$/.test(form.phone.trim())) e.phone = t('phoneInvalid');
     if (!form.city.trim()) e.city = t('cityRequired');
     if (!form.street.trim()) e.street = t('streetRequired');
     return e;

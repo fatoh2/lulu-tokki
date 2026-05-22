@@ -25,7 +25,7 @@ export default function InstallBanner() {
 
   const handleDismiss = () => {
     setDismissed(true);
-    try { localStorage.setItem('hanook-install-dismissed', '1'); } catch {}
+    try { localStorage.setItem('hanook-install-dismissed', '1'); } catch { /* localStorage unavailable */ }
   };
 
   return (

@@ -58,7 +58,7 @@ export default function Admin() {
 
   // ── Promo codes state ──
   const [promoCodes, setPromoCodes] = useState([]);
-  const [codesLoading, setCodesLoading] = useState(false);
+  const [codesLoading, setCodesLoading] = useState(true);
   const [codeForm, setCodeForm] = useState({ code: '', pct: 10, active: true });
   const [codeErrors, setCodeErrors] = useState({});
   const [editingCode, setEditingCode] = useState(null);
@@ -74,15 +74,20 @@ export default function Admin() {
   const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
-    setCodesLoading(true);
-    getDocs(collection(db, 'promoCodes'))
-      .then(snap => {
+    let active = true;
+    const loadCodes = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'promoCodes'));
         const arr = [];
         snap.forEach(d => arr.push({ code: d.id, ...d.data() }));
         arr.sort((a, b) => a.code.localeCompare(b.code));
-        setPromoCodes(arr);
-      })
-      .finally(() => setCodesLoading(false));
+        if (active) setPromoCodes(arr);
+      } finally {
+        if (active) setCodesLoading(false);
+      }
+    };
+    loadCodes();
+    return () => { active = false; };
   }, []);
 
   const handleSaveCode = async () => {

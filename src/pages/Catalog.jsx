@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -38,7 +38,13 @@ export default function Catalog() {
   const maxPriceInData = Math.ceil(Math.max(...products.map(p => p.price))) + 1;
   const effectiveMax = maxPrice ?? maxPriceInData;
 
-  useEffect(() => { setPage(1); }, [search, category, maxPrice, onlyInStock, minRating, sort]);
+  // Reset to the first page whenever the active filters change.
+  const filterKey = JSON.stringify([search, category, maxPrice, onlyInStock, minRating, sort]);
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const filtered = useMemo(() => {
     let result = [...products];

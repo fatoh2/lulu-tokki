@@ -59,7 +59,7 @@ export default function ProductDetail() {
       const ids = JSON.parse(localStorage.getItem('hanook-recently-viewed')) || [];
       return ids.filter(rid => rid !== product.id).slice(0, 6).map(rid => products.find(p => p.id === rid)).filter(Boolean);
     } catch { return []; }
-  }, [product?.id, products]);
+  }, [product, products]);
 
   useEffect(() => {
     if (!product) return;
@@ -67,8 +67,8 @@ export default function ProductDetail() {
       const key = 'hanook-recently-viewed';
       const existing = JSON.parse(localStorage.getItem(key)) || [];
       localStorage.setItem(key, JSON.stringify([product.id, ...existing.filter(id => id !== product.id)].slice(0, 8)));
-    } catch {}
-  }, [product?.id]);
+    } catch { /* localStorage unavailable */ }
+  }, [product]);
 
   if (!product) {
     return (

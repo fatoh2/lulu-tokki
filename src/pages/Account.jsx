@@ -19,18 +19,25 @@ export default function Account() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('history');
   const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setOrders([]); setOrdersLoading(false); return; }
-    const q = query(collection(db, 'orders'), where('userId', '==', user.id));
-    getDocs(q).then(snap => {
-      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      docs.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setOrders(docs);
-      setOrdersLoading(false);
-    }).catch(() => setOrdersLoading(false));
-  }, [user?.id]);
+    let active = true;
+    const loadOrders = async () => {
+      if (!user) {
+        if (active) setOrders([]);
+        return;
+      }
+      try {
+        const q = query(collection(db, 'orders'), where('userId', '==', user.id));
+        const snap = await getDocs(q);
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (active) setOrders(docs);
+      } catch { /* keep orders empty on failure */ }
+    };
+    loadOrders();
+    return () => { active = false; };
+  }, [user]);
 
   if (!user) {
     return (

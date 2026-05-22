@@ -31,7 +31,7 @@ export default function Category() {
   const { category } = useParams();
   const decoded = decodeURIComponent(category);
   const { products } = useProducts();
-  const { lang, isRTL } = useLanguage();
+  const { lang } = useLanguage();
 
   const [sort, setSort] = useState('featured');
   const [onlyInStock, setOnlyInStock] = useState(false);

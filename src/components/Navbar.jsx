@@ -25,7 +25,12 @@ export default function Navbar() {
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  // Close the mobile menu whenever the route changes.
+  const [prevPath, setPrevPath] = useState(location.pathname);
+  if (location.pathname !== prevPath) {
+    setPrevPath(location.pathname);
+    setMenuOpen(false);
+  }
 
   const isActive = (path) => location.pathname === path;
 

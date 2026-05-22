@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -32,29 +32,39 @@ function BackToTop() {
 }
 
 import { Toaster } from 'react-hot-toast';
-import { CartProvider } from './context/CartContext';
-import { ProductsProvider } from './context/ProductsContext';
-import { LanguageProvider } from './context/LanguageContext';
-import { AuthProvider } from './context/AuthContext';
-import { WishlistProvider } from './context/WishlistContext';
-import { ThemeProvider } from './context/ThemeContext';
+import { CartProvider } from './context/CartProvider';
+import { ProductsProvider } from './context/ProductsProvider';
+import { LanguageProvider } from './context/LanguageProvider';
+import { AuthProvider } from './context/AuthProvider';
+import { WishlistProvider } from './context/WishlistProvider';
+import { ThemeProvider } from './context/ThemeProvider';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import InstallBanner from './components/InstallBanner';
 import Home from './pages/Home';
-import Catalog from './pages/Catalog';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import ProductDetail from './pages/ProductDetail';
-import Category from './pages/Category';
-import Admin from './pages/Admin';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Account from './pages/Account';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import ReturnPolicy from './pages/ReturnPolicy';
-import Accessibility from './pages/Accessibility';
+
+// Route components are code-split — each loads as its own chunk on demand.
+const Catalog = lazy(() => import('./pages/Catalog'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Category = lazy(() => import('./pages/Category'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Account = lazy(() => import('./pages/Account'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const ReturnPolicy = lazy(() => import('./pages/ReturnPolicy'));
+const Accessibility = lazy(() => import('./pages/Accessibility'));
+
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
+      🇰🇷
+    </div>
+  );
+}
 
 // Register service worker
 if ('serviceWorker' in navigator) {
@@ -83,21 +93,23 @@ function AppInner() {
       <Toaster position="bottom-center" />
       <Navbar />
       <main style={{ flex: 1, background: 'var(--bg)' }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/store" element={<Catalog />} />
-          <Route path="/category/:category" element={<Category />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/returns" element={<ReturnPolicy />} />
-          <Route path="/accessibility" element={<Accessibility />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/store" element={<Catalog />} />
+            <Route path="/category/:category" element={<Category />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/returns" element={<ReturnPolicy />} />
+            <Route path="/accessibility" element={<Accessibility />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
       <InstallBanner />

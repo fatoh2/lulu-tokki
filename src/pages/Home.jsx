@@ -34,7 +34,7 @@ const FEATURES = [
 export default function Home() {
   const navigate = useNavigate();
   const { products } = useProducts();
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
 
   const mostBought = [...products].sort((a, b) => b.reviews - a.reviews).slice(0, 8);
