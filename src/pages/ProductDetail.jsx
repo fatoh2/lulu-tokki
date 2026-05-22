@@ -4,6 +4,7 @@ import { useProducts } from '../context/ProductsContext';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
+import { productName } from '../utils/productName';
 import toast from 'react-hot-toast';
 
 const HEAT_COLORS = ['', '#f59e0b', '#f97316', '#ef4444', '#dc2626', '#991b1b'];
@@ -46,7 +47,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { products } = useProducts();
   const { addItem, items, updateQty } = useCart();
-  const { t, tr, isRTL } = useLanguage();
+  const { t, tr, isRTL, lang } = useLanguage();
   const [activePhoto, setActivePhoto] = useState(0);
   const [qty, setQty] = useState(1);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
@@ -154,7 +155,7 @@ export default function ProductDetail() {
         </button>
         <span>›</span>
         <span style={{ color: '#374151', fontWeight: 700, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {product.name}
+          {productName(product, lang)}
         </span>
       </nav>
 
@@ -165,7 +166,7 @@ export default function ProductDetail() {
         <div>
           <div style={{ borderRadius: 20, background: views[activePhoto].bg, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)', marginBottom: 12 }}>
             {product.imageUrl && activePhoto === 0 ? (
-              <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : (
               <>
                 <div style={{ position: 'absolute', top: -30, left: -30, width: 150, height: 150, background: 'rgba(255,255,255,0.4)', borderRadius: '50%' }} />
@@ -190,7 +191,7 @@ export default function ProductDetail() {
             {views.map((view, i) => (
               <button key={i} onClick={() => setActivePhoto(i)} style={{ borderRadius: 12, background: view.bg, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, border: `2px solid ${activePhoto === i ? 'var(--brand)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.2s', outline: 'none', boxShadow: activePhoto === i ? '0 0 0 3px rgba(232,138,166,0.15)' : 'none', overflow: 'hidden', padding: 0, position: 'relative' }}>
                 {product.imageUrl && i === 0
-                  ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ? <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <>
                       <span style={{ fontSize: 28 }}>{product.emoji}</span>
                       <span style={{ fontSize: 10, fontWeight: 700, color: activePhoto === i ? 'var(--brand)' : '#6b7280' }}>{view.label}</span>
@@ -210,7 +211,10 @@ export default function ProductDetail() {
             {lowStock && <span style={{ background: '#fff7ed', color: '#f97316', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>🔥 {tr(`بقي ${product.stock} فقط!`, `Only ${product.stock} left!`, `נותרו ${product.stock} בלבד!`)}</span>}
           </div>
 
-          <h1 style={{ fontWeight: 800, fontSize: 26, color: 'var(--text)', margin: 0, lineHeight: 1.3 }}>{product.name}</h1>
+          <div>
+            <h1 style={{ fontWeight: 800, fontSize: 26, color: 'var(--text)', margin: 0, lineHeight: 1.3 }}>{productName(product, lang)}</h1>
+            {product.nameKo && <div style={{ fontSize: 15, color: 'var(--subtext)', fontWeight: 600, marginTop: 4 }}>{product.nameKo}</div>}
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -373,9 +377,9 @@ export default function ProductDetail() {
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
                 >
                   <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
-                    {p.imageUrl ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
+                    {p.imageUrl ? <img src={p.imageUrl} alt={productName(p, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{productName(p, lang)}</div>
                   <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--brand)' }}>{p.price.toFixed(2)} {t('currency')}</div>
                 </div>
               </Link>

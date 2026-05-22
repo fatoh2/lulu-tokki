@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useWishlist } from '../context/WishlistContext';
+import { productName } from '../utils/productName';
 import toast from 'react-hot-toast';
 
 const HEAT_LABELS = ['', '🌶️', '🌶️🌶️', '🌶️🌶️🌶️', '🌶️🌶️🌶️🌶️', '🌶️🌶️🌶️🌶️🌶️'];
@@ -9,7 +10,7 @@ const HEAT_LABELS = ['', '🌶️', '🌶️🌶️', '🌶️🌶️🌶️', '
 export default function ProductCard({ product }) {
   const { addItem, items } = useCart();
   const navigate = useNavigate();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, lang } = useLanguage();
   const { toggleWishlist, inWishlist } = useWishlist();
   const inCart = items.find(i => i.id === product.id);
   const wishlisted = inWishlist(product.id);
@@ -83,7 +84,7 @@ export default function ProductCard({ product }) {
       {/* Image */}
       <div style={{ background: 'linear-gradient(135deg, var(--brand-soft) 0%, #f0f4ff 100%)', height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72, overflow: 'hidden' }}>
         {product.imageUrl
-          ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ? <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           : product.emoji}
       </div>
 
@@ -101,7 +102,7 @@ export default function ProductCard({ product }) {
         </div>
 
         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', lineHeight: 1.4 }} className="line-clamp-2">
-          {product.name}
+          {productName(product, lang)}
         </div>
 
         <div style={{ fontSize: 12, color: 'var(--subtext)', lineHeight: 1.5, flex: 1 }} className="line-clamp-2">

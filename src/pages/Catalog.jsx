@@ -51,7 +51,11 @@ export default function Catalog() {
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
+        (p.nameAr || p.name || '').toLowerCase().includes(q) ||
+        (p.nameKo || '').toLowerCase().includes(q) ||
+        (p.nameEn || '').toLowerCase().includes(q) ||
+        (p.nameHe || '').toLowerCase().includes(q) ||
+        (p.name || '').toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
         p.brand.toLowerCase().includes(q)
       );

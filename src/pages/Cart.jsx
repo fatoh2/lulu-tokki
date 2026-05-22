@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { productName } from '../utils/productName';
 
 export default function Cart() {
   const { items, removeItem, updateQty, totalPrice, clearCart } = useCart();
-  const { t, tr } = useLanguage();
+  const { t, tr, lang } = useLanguage();
 
   if (items.length === 0) {
     return (
@@ -62,7 +63,7 @@ export default function Cart() {
                 {item.emoji}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 4, lineHeight: 1.3 }}>{item.name}</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 4, lineHeight: 1.3 }}>{productName(item, lang)}</div>
                 <div style={{ fontSize: 12, color: 'var(--subtext)', marginBottom: 8 }}>
                   {item.brand} • {item.category}
                   {item.variant && <span style={{ marginInlineStart: 6, background: '#eff6ff', color: 'var(--brand-blue)', fontWeight: 700, padding: '1px 7px', borderRadius: 5 }}>{item.variant.label}</span>}
