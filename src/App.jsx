@@ -61,8 +61,9 @@ const Accessibility = lazy(() => import('./pages/Accessibility'));
 
 function PageLoader() {
   return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Logo size={64} />
+    <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+      <Logo size={120} />
+      <div className="spinner" />
     </div>
   );
 }
@@ -83,8 +84,9 @@ function AdminRoute({ children }) {
 function AppInner() {
   const { loading } = useAuth();
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Logo size={80} />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+      <Logo size={140} />
+      <div className="spinner" />
     </div>
   );
   return (

@@ -91,7 +91,7 @@ export default function PrivacyPolicy() {
               <ul style={{ paddingInlineStart: 24, marginTop: 8 }}>
                 <li>البريد الإلكتروني: noorabutamam304@gmail.com</li>
                 <li>الهاتف: <span dir="ltr">+972-50-449-3660</span></li>
-                <li>العنوان: قلنسوة، إسرائيل</li>
+                <li>العنوان: باقة الغربية، إسرائيل</li>
               </ul>
             </section>
           </div>
