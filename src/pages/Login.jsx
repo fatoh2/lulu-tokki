@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const { login } = useAuth();
@@ -33,13 +34,15 @@ export default function Login() {
     <div style={{ maxWidth: 440, margin: '60px auto', padding: '0 20px' }}>
       <div style={{ background: 'white', borderRadius: 24, padding: 40, boxShadow: '0 8px 40px rgba(0,0,0,0.1)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>🇰🇷</div>
+          <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+            <Logo size={72} />
+          </div>
           <h1 style={{ fontWeight: 800, fontSize: 24, color: '#1a1a2e', margin: '0 0 6px' }}>{t('signIn')}</h1>
           <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>{t('storeName')}</p>
         </div>
 
         {error && (
-          <div style={{ background: '#fff0f2', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', color: '#e8002d', fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
+          <div style={{ background: 'var(--brand-soft)', border: '1px solid #fecdd3', borderRadius: 10, padding: '10px 14px', color: 'var(--brand)', fontSize: 13, fontWeight: 600, marginBottom: 20 }}>
             ⚠ {error}
           </div>
         )}
@@ -51,7 +54,7 @@ export default function Login() {
               type="email" value={form.email} required
               onChange={e => { setForm(f => ({ ...f, email: e.target.value })); setError(''); }}
               placeholder={t('emailPlaceholder')} style={inputStyle}
-              onFocus={e => e.target.style.borderColor = '#e8002d'}
+              onFocus={e => e.target.style.borderColor = 'var(--brand)'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
@@ -61,13 +64,13 @@ export default function Login() {
               type="password" value={form.password} required
               onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setError(''); }}
               style={inputStyle}
-              onFocus={e => e.target.style.borderColor = '#e8002d'}
+              onFocus={e => e.target.style.borderColor = 'var(--brand)'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
-          <button type="submit" style={{ padding: '13px 20px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', marginTop: 4, transition: 'background 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-            onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+          <button type="submit" style={{ padding: '13px 20px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', marginTop: 4, transition: 'background 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-dark)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--brand)'}
           >
             {t('loginBtn')}
           </button>
@@ -75,7 +78,7 @@ export default function Login() {
 
         <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#6b7280', margin: '24px 0 0' }}>
           {t('noAccount')}{' '}
-          <Link to="/signup" style={{ color: '#e8002d', fontWeight: 700, textDecoration: 'none' }}>{t('signUp')}</Link>
+          <Link to="/signup" style={{ color: 'var(--brand)', fontWeight: 700, textDecoration: 'none' }}>{t('signUp')}</Link>
         </p>
       </div>
     </div>

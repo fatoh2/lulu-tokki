@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import Logo from '../components/Logo';
 
 function Field({ label, error, children }) {
   return (
     <div>
       <label style={{ display: 'block', fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 6 }}>{label}</label>
       {children}
-      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
+      {error && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
     </div>
   );
 }
@@ -48,18 +49,20 @@ export default function Signup() {
 
   const inputStyle = (hasErr) => ({
     width: '100%', padding: '11px 14px', borderRadius: 10,
-    border: `2px solid ${hasErr ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif',
+    border: `2px solid ${hasErr ? 'var(--brand)' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif',
     fontSize: 14, color: '#1a1a2e', outline: 'none', boxSizing: 'border-box', background: 'white',
   });
 
-  const focus = (field) => (e) => { if (!errors[field]) e.target.style.borderColor = '#e8002d'; };
+  const focus = (field) => (e) => { if (!errors[field]) e.target.style.borderColor = 'var(--brand)'; };
   const blur  = (field) => (e) => { if (!errors[field]) e.target.style.borderColor = '#e5e7eb'; };
 
   return (
     <div style={{ maxWidth: 440, margin: '60px auto', padding: '0 20px' }}>
       <div style={{ background: 'white', borderRadius: 24, padding: 40, boxShadow: '0 8px 40px rgba(0,0,0,0.1)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>🇰🇷</div>
+          <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+            <Logo size={72} />
+          </div>
           <h1 style={{ fontWeight: 800, fontSize: 24, color: '#1a1a2e', margin: '0 0 6px' }}>{t('signUp')}</h1>
           <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>{t('storeName')}</p>
         </div>
@@ -77,9 +80,9 @@ export default function Signup() {
           <Field label={t('confirmPasswordLabel')} error={errors.confirm}>
             <input type="password" value={form.confirm} onChange={set('confirm')} style={inputStyle(!!errors.confirm)} onFocus={focus('confirm')} onBlur={blur('confirm')} />
           </Field>
-          <button type="submit" style={{ padding: '13px 20px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', marginTop: 4, transition: 'background 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-            onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+          <button type="submit" style={{ padding: '13px 20px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', marginTop: 4, transition: 'background 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-dark)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--brand)'}
           >
             {t('signupBtn')}
           </button>
@@ -87,7 +90,7 @@ export default function Signup() {
 
         <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#6b7280', margin: '24px 0 0' }}>
           {t('hasAccount')}{' '}
-          <Link to="/login" style={{ color: '#e8002d', fontWeight: 700, textDecoration: 'none' }}>{t('signIn')}</Link>
+          <Link to="/login" style={{ color: 'var(--brand)', fontWeight: 700, textDecoration: 'none' }}>{t('signIn')}</Link>
         </p>
       </div>
     </div>

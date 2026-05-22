@@ -10,7 +10,7 @@ const PAGE_SIZE = 20;
 
 export default function Catalog() {
   const { products } = useProducts();
-  const { t, lang, isRTL } = useLanguage();
+  const { t, tr, isRTL } = useLanguage();
   const location = useLocation();
 
   const [search, setSearch] = useState('');
@@ -92,7 +92,7 @@ export default function Catalog() {
 
       {/* Hero */}
       <div style={{
-        background: 'linear-gradient(135deg, #e8002d 0%, #b5001f 50%, #003478 100%)',
+        background: 'linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 50%, var(--brand-blue) 100%)',
         borderRadius: 20, padding: '32px 40px', marginBottom: 32,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         overflow: 'hidden', position: 'relative',
@@ -122,7 +122,7 @@ export default function Catalog() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ width: '100%', padding: isRTL ? '14px 50px 14px 20px' : '14px 20px 14px 50px', borderRadius: 12, border: '2px solid var(--border)', background: 'var(--card)', color: 'var(--text)', fontSize: 15, fontFamily: 'Cairo, sans-serif', outline: 'none', boxSizing: 'border-box' }}
-          onFocus={e => e.target.style.borderColor = '#e8002d'}
+          onFocus={e => e.target.style.borderColor = 'var(--brand)'}
           onBlur={e => e.target.style.borderColor = 'var(--border)'}
         />
         {search && (
@@ -135,8 +135,8 @@ export default function Catalog() {
         {CATEGORIES.map(cat => (
           <button key={cat} onClick={() => setCategory(cat)} style={{
             padding: '8px 18px', borderRadius: 24, border: '2px solid',
-            borderColor: category === cat ? '#e8002d' : 'var(--border)',
-            background: category === cat ? '#e8002d' : 'var(--card)',
+            borderColor: category === cat ? 'var(--brand)' : 'var(--border)',
+            background: category === cat ? 'var(--brand)' : 'var(--card)',
             color: category === cat ? 'white' : 'var(--text)',
             fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer',
           }}>{catLabel(cat)}</button>
@@ -162,15 +162,15 @@ export default function Catalog() {
             onClick={() => setFiltersOpen(!filtersOpen)}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 10,
-              border: '2px solid', borderColor: activeFiltersCount > 0 ? '#e8002d' : '#e5e7eb',
-              background: activeFiltersCount > 0 ? '#fff0f2' : 'white',
-              color: activeFiltersCount > 0 ? '#e8002d' : '#374151',
+              border: '2px solid', borderColor: activeFiltersCount > 0 ? 'var(--brand)' : '#e5e7eb',
+              background: activeFiltersCount > 0 ? 'var(--brand-soft)' : 'white',
+              color: activeFiltersCount > 0 ? 'var(--brand)' : '#374151',
               fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer',
             }}
           >
             <span>{t('filterBtn')}</span>
             {activeFiltersCount > 0 && (
-              <span style={{ background: '#e8002d', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+              <span style={{ background: 'var(--brand)', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
                 {activeFiltersCount}
               </span>
             )}
@@ -183,11 +183,11 @@ export default function Catalog() {
 
       {/* Filter Panel */}
       {filtersOpen && (
-        <div style={{ background: 'var(--card)', borderRadius: 16, padding: 24, marginBottom: 24, border: '2px solid #e8002d', boxShadow: '0 4px 20px rgba(232,0,45,0.1)' }}>
+        <div style={{ background: 'var(--card)', borderRadius: 16, padding: 24, marginBottom: 24, border: '2px solid var(--brand)', boxShadow: '0 4px 20px rgba(232,138,166,0.1)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
             <div>
               <label style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', display: 'block', marginBottom: 10 }}>
-                {t('maxPriceLabel')}: <span style={{ color: '#e8002d' }}>{effectiveMax} {t('currency')}</span>
+                {t('maxPriceLabel')}: <span style={{ color: 'var(--brand)' }}>{effectiveMax} {t('currency')}</span>
               </label>
               <input type="range" min={5} max={maxPriceInData} step={0.5}
                 value={effectiveMax}
@@ -214,7 +214,7 @@ export default function Catalog() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                <div onClick={() => setOnlyInStock(!onlyInStock)} style={{ width: 48, height: 26, borderRadius: 13, cursor: 'pointer', background: onlyInStock ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                <div onClick={() => setOnlyInStock(!onlyInStock)} style={{ width: 48, height: 26, borderRadius: 13, cursor: 'pointer', background: onlyInStock ? 'var(--brand)' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: onlyInStock ? 4 : 24, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
                 </div>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#374151' }}>{t('inStockOnly')}</span>
@@ -246,7 +246,7 @@ export default function Catalog() {
           <Pagination currentPage={page} totalPages={totalPages} onPageChange={p => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           {totalPages > 1 && (
             <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 13, marginTop: 4 }}>
-              {lang === 'ar' ? 'عرض' : 'Showing'} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} {t('ofLabel')} {filtered.length} {t('productsLabel')}
+              {tr('عرض', 'Showing', 'מציג')} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} {t('ofLabel')} {filtered.length} {t('productsLabel')}
             </div>
           )}
         </>

@@ -20,8 +20,8 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
         minWidth: 38,
         height: 38,
         borderRadius: 8,
-        border: `2px solid ${active ? '#e8002d' : '#e5e7eb'}`,
-        background: active ? '#e8002d' : 'white',
+        border: `2px solid ${active ? 'var(--brand)' : '#e5e7eb'}`,
+        background: active ? 'var(--brand)' : 'white',
         color: active ? 'white' : disabled ? '#d1d5db' : '#374151',
         fontFamily: 'Cairo, sans-serif',
         fontWeight: 700,
@@ -30,7 +30,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
         transition: 'all 0.15s',
         padding: '0 6px',
       }}
-      onMouseEnter={e => { if (!active && !disabled) e.currentTarget.style.borderColor = '#e8002d'; }}
+      onMouseEnter={e => { if (!active && !disabled) e.currentTarget.style.borderColor = 'var(--brand)'; }}
       onMouseLeave={e => { if (!active && !disabled) e.currentTarget.style.borderColor = '#e5e7eb'; }}
     >
       {content}

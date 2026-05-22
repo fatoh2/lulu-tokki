@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import Logo from './Logo';
 
 export default function Footer() {
-  const { t, lang } = useLanguage();
+  const { t, tr } = useLanguage();
   const { user } = useAuth();
 
   const links = [
@@ -13,9 +14,9 @@ export default function Footer() {
   ];
 
   const legalLinks = [
-    { label: lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy', to: '/privacy' },
-    { label: lang === 'ar' ? 'سياسة الإرجاع' : 'Return Policy', to: '/returns' },
-    { label: lang === 'ar' ? '♿ إمكانية الوصول' : '♿ Accessibility', to: '/accessibility' },
+    { label: tr('سياسة الخصوصية', 'Privacy Policy', 'מדיניות פרטיות'), to: '/privacy' },
+    { label: tr('سياسة الإرجاع', 'Return Policy', 'מדיניות החזרות'), to: '/returns' },
+    { label: tr('♿ إمكانية الوصول', '♿ Accessibility', '♿ נגישות'), to: '/accessibility' },
   ];
 
   const contacts = [
@@ -36,9 +37,9 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <span style={{ fontSize: 28 }}>🇰🇷</span>
+              <Logo size={38} />
               <div>
-                <div style={{ fontWeight: 800, fontSize: 18, color: '#e8002d' }}>{t('storeName')}</div>
+                <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--brand)' }}>{t('storeName')}</div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Korean Snacks Store</div>
               </div>
             </div>
@@ -47,12 +48,12 @@ export default function Footer() {
             </p>
             {/* Business identity */}
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', lineHeight: 1.7 }}>
-              <div>{lang === 'ar' ? 'ע.מ. / ח.פ.: 000000000' : 'Reg. No.: 000000000'}</div>
-              <div>{lang === 'ar' ? 'قلنسوة، إسرائيل' : 'Qalansawe, Israel'}</div>
+              <div>{tr('ע.מ. / ח.פ.: 000000000', 'Reg. No.: 000000000', 'ע.מ. / ח.פ.: 000000000')}</div>
+              <div>{tr('قلنسوة، إسرائيل', 'Qalansawe, Israel', 'קלנסווה, ישראל')}</div>
             </div>
             {/* VAT note */}
             <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: '5px 10px', display: 'inline-block' }}>
-              {lang === 'ar' ? '💡 جميع الأسعار تشمل مع"מ' : '💡 All prices include VAT'}
+              {tr('💡 جميع الأسعار تشمل مע"מ', '💡 All prices include VAT', '💡 כל המחירים כוללים מע״מ')}
             </div>
           </div>
 
@@ -67,7 +68,7 @@ export default function Footer() {
                   key={link.to}
                   to={link.to}
                   style={linkStyle}
-                  onMouseEnter={e => e.currentTarget.style.color = '#e8002d'}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--brand)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
                 >
                   {link.label}
@@ -79,7 +80,7 @@ export default function Footer() {
           {/* Legal */}
           <div>
             <h4 style={headingStyle}>
-              {lang === 'ar' ? 'قانوني' : 'Legal'}
+              {tr('قانوني', 'Legal', 'משפטי')}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {legalLinks.map(link => (
@@ -87,7 +88,7 @@ export default function Footer() {
                   key={link.to}
                   to={link.to}
                   style={linkStyle}
-                  onMouseEnter={e => e.currentTarget.style.color = '#e8002d'}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--brand)'}
                   onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
                 >
                   {link.label}
@@ -113,15 +114,15 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 16, color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
-          <span>🇰🇷 {t('storeName')} © {new Date().getFullYear()} — {t('footerRights')}</span>
+          <span>🐰 {t('storeName')} © {new Date().getFullYear()} — {t('footerRights')}</span>
           <Link
             to="/accessibility"
             style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, border: '1px solid rgba(255,255,255,0.15)', borderRadius: 20, padding: '3px 10px', transition: 'all 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
-            title={lang === 'ar' ? 'إعلان إمكانية الوصول' : 'Accessibility Statement'}
+            title={tr('إعلان إمكانية الوصول', 'Accessibility Statement', 'הצהרת נגישות')}
           >
-            ♿ {lang === 'ar' ? 'إمكانية الوصول' : 'Accessibility'}
+            ♿ {tr('إمكانية الوصول', 'Accessibility', 'נגישות')}
           </Link>
           {user?.isAdmin && (
             <Link to="/admin" style={{ color: 'rgba(255,255,255,0.12)', fontSize: 11, textDecoration: 'none' }} title="">⚙</Link>

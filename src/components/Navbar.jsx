@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Logo from './Logo';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -17,13 +18,28 @@ function useIsMobile() {
 
 export default function Navbar() {
   const { totalItems } = useCart();
-  const { t, toggleLang, lang } = useLanguage();
+  const { t, lang, setLang, isRTL } = useLanguage();
   const { user, logout } = useAuth();
   const { dark, toggle: toggleDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+
+  const LANGS = [
+    { code: 'ar', label: 'العربية' },
+    { code: 'he', label: 'עברית' },
+    { code: 'en', label: 'English' },
+  ];
+  const currentLangLabel = LANGS.find(l => l.code === lang)?.label;
+
+  useEffect(() => {
+    if (!langOpen) return;
+    const close = () => setLangOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [langOpen]);
 
   // Close the mobile menu whenever the route changes.
   const [prevPath, setPrevPath] = useState(location.pathname);
@@ -40,8 +56,8 @@ export default function Navbar() {
     borderRadius: 8,
     fontWeight: 600,
     fontSize: 15,
-    color: isActive(path) ? '#e8002d' : 'var(--subtext)',
-    background: isActive(path) ? '#fff0f2' : 'transparent',
+    color: isActive(path) ? 'var(--brand)' : 'var(--subtext)',
+    background: isActive(path) ? 'var(--brand-soft)' : 'transparent',
   });
 
   const iconBtnStyle = {
@@ -53,19 +69,16 @@ export default function Navbar() {
   const firstName = user?.name?.split(' ')[0] || '';
 
   return (
-    <nav style={{ background: 'var(--nav-bg)', borderBottom: '2px solid #e8002d', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-md)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: lang === 'ar' ? 'row' : 'row-reverse' }}>
+    <nav style={{ background: 'var(--nav-bg)', borderBottom: '2px solid var(--brand)', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-md)' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: isRTL ? 'row' : 'row-reverse' }}>
 
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 28 }}>🇰🇷</span>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 18, color: '#e8002d', lineHeight: 1.1 }}>{t('storeName')}</div>
-            <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1 }}>Korean Snacks Store</div>
-          </div>
+          <Logo size={46} />
+          <span style={{ fontWeight: 900, fontSize: 19, background: 'linear-gradient(135deg, var(--brand), var(--brand-blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>Lulu Tokki</span>
         </Link>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: lang === 'ar' ? 'row-reverse' : 'row' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
           {!isMobile && (
             <>
               <Link to="/" style={navLinkStyle('/')}>{t('footerHome')}</Link>
@@ -74,7 +87,7 @@ export default function Navbar() {
               {user ? (
                 <>
                   <Link to="/account" style={{ ...navLinkStyle('/account'), display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg,#e8002d,#003478)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'white', fontWeight: 800 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg,var(--brand),var(--brand-blue))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'white', fontWeight: 800 }}>
                       {firstName.charAt(0).toUpperCase()}
                     </span>
                     {firstName}
@@ -82,7 +95,7 @@ export default function Navbar() {
                   <button
                     onClick={() => { logout(); navigate('/'); }}
                     style={iconBtnStyle}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.color = '#e8002d'; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
                   >
                     {t('signOut')}
@@ -91,48 +104,56 @@ export default function Navbar() {
               ) : (
                 <>
                   <Link to="/login" style={navLinkStyle('/login')}>{t('signIn')}</Link>
-                  <Link to="/signup" style={{ ...navLinkStyle('/signup'), background: '#e8002d', color: 'white', padding: '8px 16px' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+                  <Link to="/signup" style={{ ...navLinkStyle('/signup'), background: 'var(--brand)', color: 'white', padding: '8px 16px' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-dark)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--brand)'}
                   >{t('signUp')}</Link>
                 </>
               )}
             </>
           )}
 
-          {/* Dark mode toggle */}
-          <button
-            onClick={toggleDark}
-            title={dark ? 'Light mode' : 'Dark mode'}
-            style={{ ...iconBtnStyle, fontSize: 16, padding: '6px 10px' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
-          >
-            {dark ? '☀️' : '🌙'}
-          </button>
+          {/* Dark mode toggle — desktop only */}
+          {!isMobile && (
+            <button
+              onClick={toggleDark}
+              title={dark ? 'Light mode' : 'Dark mode'}
+              style={{ ...iconBtnStyle, fontSize: 16, padding: '6px 10px' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+            >
+              {dark ? '☀️' : '🌙'}
+            </button>
+          )}
 
-          {/* Lang toggle */}
-          <button
-            onClick={toggleLang}
-            style={iconBtnStyle}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.color = '#e8002d'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
-          >
-            {t('langToggle')}
-          </button>
-
-          {/* Cart */}
-          <Link
-            to="/cart"
-            style={{ textDecoration: 'none', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 10, color: isActive('/cart') ? 'white' : '#e8002d', background: isActive('/cart') ? '#e8002d' : '#fff0f2', border: '2px solid #e8002d', fontSize: 20 }}
-          >
-            🛒
-            {totalItems > 0 && (
-              <span style={{ position: 'absolute', top: -8, left: -8, background: '#003478', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, boxShadow: '0 2px 6px rgba(0,52,120,0.4)' }}>
-                {totalItems > 99 ? '99+' : totalItems}
-              </span>
-            )}
-          </Link>
+          {/* Lang dropdown — desktop only */}
+          {!isMobile && (
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={e => { e.stopPropagation(); setLangOpen(o => !o); }}
+                style={iconBtnStyle}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
+              >
+                {currentLangLabel} ▾
+              </button>
+              {langOpen && (
+                <div style={{ position: 'absolute', top: '110%', right: 0, background: 'var(--card)', border: '2px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', zIndex: 100, minWidth: 120 }}>
+                  {LANGS.map(l => (
+                    <button
+                      key={l.code}
+                      onClick={() => { setLang(l.code); setLangOpen(false); }}
+                      style={{ display: 'block', width: '100%', padding: '10px 16px', border: 'none', background: lang === l.code ? 'var(--brand-soft)' : 'transparent', color: lang === l.code ? 'var(--brand)' : 'var(--text)', fontFamily: 'Cairo, sans-serif', fontWeight: lang === l.code ? 800 : 600, fontSize: 14, cursor: 'pointer', textAlign: 'start' }}
+                      onMouseEnter={e => { if (lang !== l.code) e.currentTarget.style.background = 'var(--muted-bg)'; }}
+                      onMouseLeave={e => { if (lang !== l.code) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Hamburger */}
           {isMobile && (
@@ -146,21 +167,34 @@ export default function Navbar() {
               <div style={{ width: 22, height: 2, background: 'var(--subtext)', borderRadius: 2, transform: menuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none' }} />
             </button>
           )}
+
+          {/* Cart */}
+          <Link
+            to="/cart"
+            style={{ textDecoration: 'none', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 10, color: isActive('/cart') ? 'white' : 'var(--brand)', background: isActive('/cart') ? 'var(--brand)' : 'var(--brand-soft)', border: '2px solid var(--brand)', fontSize: 20 }}
+          >
+            🛒
+            {totalItems > 0 && (
+              <span style={{ position: 'absolute', top: -8, left: -8, background: 'var(--brand-dark)', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, boxShadow: '0 2px 6px rgba(208,111,143,0.4)' }}>
+                {totalItems > 99 ? '99+' : totalItems}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
       {/* Mobile dropdown */}
       {isMobile && menuOpen && (
-        <div style={{ background: 'var(--nav-bg)', borderTop: '1px solid var(--border)', borderBottom: '2px solid #e8002d', padding: '12px 20px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
-          <Link to="/" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ background: 'var(--nav-bg)', borderTop: '1px solid var(--border)', borderBottom: '2px solid var(--brand)', padding: '12px 20px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+          <Link to="/" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/') ? 'var(--brand)' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
             {t('footerHome')}
           </Link>
-          <Link to="/store" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/store') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+          <Link to="/store" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/store') ? 'var(--brand)' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
             {t('navStore')}
           </Link>
           {user ? (
             <>
-              <Link to="/account" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/account') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+              <Link to="/account" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/account') ? 'var(--brand)' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 👤 {user.name}
               </Link>
               <button onClick={() => { logout(); navigate('/'); }} style={{ display: 'block', width: '100%', textAlign: 'start', padding: '12px 0', fontWeight: 700, fontSize: 16, color: 'var(--subtext)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Cairo, sans-serif' }}>
@@ -169,19 +203,43 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/login') ? '#e8002d' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+              <Link to="/login" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/login') ? 'var(--brand)' : 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 {t('signIn')}
               </Link>
-              <Link to="/signup" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/signup') ? '#e8002d' : 'var(--text)', textDecoration: 'none' }}>
+              <Link to="/signup" style={{ display: 'block', padding: '12px 0', fontWeight: 700, fontSize: 16, color: isActive('/signup') ? 'var(--brand)' : 'var(--text)', textDecoration: 'none' }}>
                 {t('signUp')}
               </Link>
             </>
           )}
-          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-            <button onClick={toggleDark} style={{ ...iconBtnStyle, fontSize: 16 }}>
+          <div style={{ display: 'flex', gap: 10, marginTop: 12, maxWidth: '50%' }}>
+            <button onClick={toggleDark} style={{ ...iconBtnStyle, flex: 1, fontSize: 13, textAlign: 'center', padding: '8px 6px', whiteSpace: 'nowrap' }}>
               {dark ? '☀️ Light' : '🌙 Dark'}
             </button>
-            <button onClick={toggleLang} style={iconBtnStyle}>{t('langToggle')}</button>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <button
+                onClick={e => { e.stopPropagation(); setLangOpen(o => !o); }}
+                style={{ ...iconBtnStyle, width: '100%', textAlign: 'center', padding: '8px 6px', whiteSpace: 'nowrap' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
+              >
+                {currentLangLabel} ▾
+              </button>
+              {langOpen && (
+                <div style={{ position: 'absolute', bottom: '110%', right: 0, background: 'var(--card)', border: '2px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', zIndex: 100, minWidth: 120 }}>
+                  {LANGS.map(l => (
+                    <button
+                      key={l.code}
+                      onClick={() => { setLang(l.code); setLangOpen(false); }}
+                      style={{ display: 'block', width: '100%', padding: '10px 16px', border: 'none', background: lang === l.code ? 'var(--brand-soft)' : 'transparent', color: lang === l.code ? 'var(--brand)' : 'var(--text)', fontFamily: 'Cairo, sans-serif', fontWeight: lang === l.code ? 800 : 600, fontSize: 14, cursor: 'pointer', textAlign: 'start' }}
+                      onMouseEnter={e => { if (lang !== l.code) e.currentTarget.style.background = 'var(--muted-bg)'; }}
+                      onMouseLeave={e => { if (lang !== l.code) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

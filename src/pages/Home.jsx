@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
+import Logo from '../components/Logo';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900);
@@ -25,8 +26,7 @@ const CATEGORIES = [
 ];
 
 const FEATURES = [
-  { icon: '🚚', t1: 'feat1Title', t2: 'feat1Desc', color: '#e8002d', bg: '#fff0f2' },
-  { icon: '🇰🇷', t1: 'feat2Title', t2: 'feat2Desc', color: '#003478', bg: '#eff6ff' },
+  { icon: '🐰', t1: 'feat2Title', t2: 'feat2Desc', color: 'var(--brand-blue)', bg: '#eff6ff' },
   { icon: '⚡', t1: 'feat3Title', t2: 'feat3Desc', color: '#059669', bg: '#f0fdf4' },
   { icon: '🔒', t1: 'feat4Title', t2: 'feat4Desc', color: '#d97706', bg: '#fffbeb' },
 ];
@@ -44,7 +44,7 @@ export default function Home() {
     <div>
       {/* ── Hero ── */}
       <div style={{
-        backgroundImage: `linear-gradient(135deg, rgba(232,0,45,0.82) 0%, rgba(155,0,30,0.75) 45%, rgba(0,52,120,0.82) 100%), url(${HERO_BG})`,
+        backgroundImage: `linear-gradient(135deg, rgba(232,138,166,0.90) 0%, rgba(208,111,143,0.86) 45%, rgba(143,188,217,0.90) 100%), url(${HERO_BG})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: 520,
@@ -57,7 +57,9 @@ export default function Home() {
         overflow: 'hidden',
       }}>
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
-          <div style={{ fontSize: 64, marginBottom: 18, lineHeight: 1 }}>🇰🇷</div>
+          <div style={{ marginBottom: 18, display: 'flex', justifyContent: 'center' }}>
+            <Logo size={112} />
+          </div>
           <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
             {t('heroTitle')}
           </h1>
@@ -67,7 +69,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={() => navigate('/store')}
-              style={{ padding: '14px 38px', borderRadius: 14, background: 'white', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+              style={{ padding: '14px 38px', borderRadius: 14, background: 'white', color: 'var(--brand)', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', transition: 'transform 0.15s, box-shadow 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.28)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)'; }}
             >
@@ -121,7 +123,7 @@ export default function Home() {
       {/* ── Best Sellers ── */}
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 20px' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontSize: 13, color: '#e8002d', fontWeight: 700, letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 13, color: 'var(--brand)', fontWeight: 700, letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' }}>
             🔥 {t('mostBoughtSubtitle')}
           </div>
           <h2 style={{ fontWeight: 900, fontSize: 30, color: 'var(--text)', margin: 0 }}>
@@ -134,9 +136,9 @@ export default function Home() {
         <div style={{ textAlign: 'center', marginTop: 40 }}>
           <button
             onClick={() => navigate('/store')}
-            style={{ padding: '13px 44px', borderRadius: 12, background: '#e8002d', color: 'white', border: 'none', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = '#b5001f'}
-            onMouseLeave={e => e.currentTarget.style.background = '#e8002d'}
+            style={{ padding: '13px 44px', borderRadius: 12, background: 'var(--brand)', color: 'white', border: 'none', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-dark)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--brand)'}
           >
             {t('viewAllProducts')} →
           </button>
@@ -155,7 +157,7 @@ export default function Home() {
                 key={cat.key}
                 to={`/category/${encodeURIComponent(cat.key)}`}
                 style={{ background: 'var(--card)', border: '2px solid var(--card-border)', borderRadius: 20, padding: '28px 12px', textAlign: 'center', fontFamily: 'Cairo, sans-serif', textDecoration: 'none', display: 'block' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(232,0,45,0.12)'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(232,138,166,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <div style={{ fontSize: 46, marginBottom: 10, lineHeight: 1 }}>{cat.emoji}</div>

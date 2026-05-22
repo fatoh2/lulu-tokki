@@ -21,17 +21,17 @@ function Field({ label, required, error, children }) {
   return (
     <div>
       <label style={{ display: 'block', fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 6 }}>
-        {label} {required && <span style={{ color: '#e8002d' }}>*</span>}
+        {label} {required && <span style={{ color: 'var(--brand)' }}>*</span>}
       </label>
       {children}
-      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
+      {error && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 4, fontWeight: 600 }}>⚠ {error}</div>}
     </div>
   );
 }
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
-  const { t, lang, isRTL } = useLanguage();
+  const { t, tr, isRTL } = useLanguage();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [submitted, setSubmitted] = useState(false);
@@ -100,43 +100,60 @@ export default function Checkout() {
     const sep = '━━━━━━━━━━━━━━━';
     const itemLines = items.map(item => `• ${item.name} × ${item.quantity} — ₪${(item.price * item.quantity).toFixed(2)}`).join('\n');
     const shippingText = shipping === 0
-      ? (lang === 'ar' ? 'مجاني 🎉' : 'Free 🎉')
+      ? tr('مجاني 🎉', 'Free 🎉', 'חינם 🎉')
       : `₪${shipping.toFixed(2)}`;
     const addressParts = [form.city, form.district, form.street, form.building].filter(Boolean).join(', ');
 
-    const msg = lang === 'ar'
-      ? [
-          '🛒 طلب جديد - هانوك سناكس',
-          sep,
-          `👤 الاسم: ${form.name}`,
-          `📱 التلفون: ${form.phone}`,
-          `📍 العنوان: ${addressParts}`,
-          form.notes.trim() ? `📝 ملاحظات: ${form.notes}` : '',
-          sep,
-          '🛍️ المنتجات:',
-          itemLines,
-          sep,
-          `💰 المجموع الفرعي: ₪${totalPrice.toFixed(2)}`,
-          appliedPromo ? `🎟️ كود الخصم (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
-          `🚚 الشحن: ${shippingText}`,
-          `✅ الإجمالي: ₪${total.toFixed(2)}`,
-        ].filter(line => line !== '').join('\n')
-      : [
-          '🛒 New Order - Hanook Snacks',
-          sep,
-          `👤 Name: ${form.name}`,
-          `📱 Phone: ${form.phone}`,
-          `📍 Address: ${addressParts}`,
-          form.notes.trim() ? `📝 Notes: ${form.notes}` : '',
-          sep,
-          '🛍️ Items:',
-          itemLines,
-          sep,
-          `💰 Subtotal: ₪${totalPrice.toFixed(2)}`,
-          appliedPromo ? `🎟️ Promo (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
-          `🚚 Shipping: ${shippingText}`,
-          `✅ Total: ₪${total.toFixed(2)}`,
-        ].filter(line => line !== '').join('\n');
+    const msg = tr(
+      [
+        '🛒 طلب جديد - Lulu Tokki',
+        sep,
+        `👤 الاسم: ${form.name}`,
+        `📱 التلفون: ${form.phone}`,
+        `📍 العنوان: ${addressParts}`,
+        form.notes.trim() ? `📝 ملاحظات: ${form.notes}` : '',
+        sep,
+        '🛍️ المنتجات:',
+        itemLines,
+        sep,
+        `💰 المجموع الفرعي: ₪${totalPrice.toFixed(2)}`,
+        appliedPromo ? `🎟️ كود الخصم (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
+        `🚚 الشحن: ${shippingText}`,
+        `✅ الإجمالي: ₪${total.toFixed(2)}`,
+      ].filter(line => line !== '').join('\n'),
+      [
+        '🛒 New Order - Lulu Tokki',
+        sep,
+        `👤 Name: ${form.name}`,
+        `📱 Phone: ${form.phone}`,
+        `📍 Address: ${addressParts}`,
+        form.notes.trim() ? `📝 Notes: ${form.notes}` : '',
+        sep,
+        '🛍️ Items:',
+        itemLines,
+        sep,
+        `💰 Subtotal: ₪${totalPrice.toFixed(2)}`,
+        appliedPromo ? `🎟️ Promo (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
+        `🚚 Shipping: ${shippingText}`,
+        `✅ Total: ₪${total.toFixed(2)}`,
+      ].filter(line => line !== '').join('\n'),
+      [
+        '🛒 הזמנה חדשה - Lulu Tokki',
+        sep,
+        `👤 שם: ${form.name}`,
+        `📱 טלפון: ${form.phone}`,
+        `📍 כתובת: ${addressParts}`,
+        form.notes.trim() ? `📝 הערות: ${form.notes}` : '',
+        sep,
+        '🛍️ מוצרים:',
+        itemLines,
+        sep,
+        `💰 סכום ביניים: ₪${totalPrice.toFixed(2)}`,
+        appliedPromo ? `🎟️ קוד הנחה (${appliedPromo.code} — ${appliedPromo.pct}%): -₪${discountAmt.toFixed(2)}` : '',
+        `🚚 משלוח: ${shippingText}`,
+        `✅ סה״כ: ₪${total.toFixed(2)}`,
+      ].filter(line => line !== '').join('\n'),
+    );
 
     try {
       await addDoc(collection(db, 'orders'), {
@@ -178,7 +195,7 @@ export default function Checkout() {
       <div style={{ maxWidth: 500, margin: '80px auto', textAlign: 'center', padding: '0 20px' }}>
         <div style={{ fontSize: 72, marginBottom: 16 }}>🛒</div>
         <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a1a2e', marginBottom: 10 }}>{t('emptyCartTitle')}</h2>
-        <Link to="/store" style={{ display: 'inline-block', padding: '12px 32px', background: '#e8002d', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
+        <Link to="/store" style={{ display: 'inline-block', padding: '12px 32px', background: 'var(--brand)', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
           {t('backToStoreBtn')}
         </Link>
       </div>
@@ -194,20 +211,24 @@ export default function Checkout() {
           <div style={{ fontSize: 72, marginBottom: 12 }}>📲</div>
           <h2 style={{ fontWeight: 900, fontSize: 26, color: 'var(--text)', marginBottom: 8 }}>{t('orderSuccessTitle')}</h2>
           <p style={{ color: 'var(--subtext)', fontSize: 16, lineHeight: 1.6, marginBottom: 6 }}>
-            {lang === 'ar'
-              ? <>شكراً لك يا <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>
-              : <>Thank you, <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>}
+            {tr(
+              <>شكراً لك يا <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>,
+              <>Thank you, <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>,
+              <>תודה רבה, <strong style={{ color: 'var(--text)' }}>{o.form.name}</strong>! 🎉</>,
+            )}
           </p>
           <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-            {lang === 'ar'
-              ? 'تم فتح واتساب لإرسال طلبك. سنتواصل معك قريباً لتأكيد التفاصيل. 🇰🇷'
-              : "WhatsApp opened to send your order. We'll reach out shortly to confirm. 🇰🇷"}
+            {tr(
+              'تم فتح واتساب لإرسال طلبك. سنتواصل معك قريباً لتأكيد التفاصيل. 🐰',
+              "WhatsApp opened to send your order. We'll reach out shortly to confirm. 🐰",
+              'וואטסאפ נפתח לשליחת ההזמנה. ניצור איתך קשר בקרוב לאישור הפרטים. 🐰',
+            )}
           </p>
 
           {/* Order details card */}
           <div style={{ background: 'var(--muted-bg)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text)', marginBottom: 14, paddingBottom: 10, borderBottom: '2px solid var(--border)' }}>
-              {lang === 'ar' ? '🛍️ ملخص طلبك' : '🛍️ Your Order Summary'}
+              {tr('🛍️ ملخص طلبك', '🛍️ Your Order Summary', '🛍️ סיכום ההזמנה')}
             </div>
 
             {/* Items */}
@@ -236,23 +257,23 @@ export default function Checkout() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: 'var(--text)', marginTop: 4 }}>
                 <span>{t('totalLabel')}</span>
-                <span style={{ color: '#e8002d' }}>{o.total.toFixed(2)} {t('currency')}</span>
+                <span style={{ color: 'var(--brand)' }}>{o.total.toFixed(2)} {t('currency')}</span>
               </div>
               <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
-                {lang === 'ar' ? '* السعر يشمل מע"מ' : '* Price includes VAT'}
+                {tr('* السعر يشمل מע"מ', '* Price includes VAT', '* המחיר כולל מע״מ')}
               </div>
             </div>
 
             {/* Delivery address */}
             <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 13, color: 'var(--subtext)' }}>
-              <span style={{ fontWeight: 700, color: 'var(--text)' }}>📍 {lang === 'ar' ? 'عنوان التوصيل:' : 'Delivery to:'}</span>{' '}
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>📍 {tr('عنوان التوصيل:', 'Delivery to:', 'כתובת למשלוח:')}</span>{' '}
               {addressParts}
             </div>
           </div>
 
           <Link
             to="/store"
-            style={{ display: 'inline-block', padding: '14px 40px', background: '#e8002d', color: 'white', textDecoration: 'none', borderRadius: 12, fontWeight: 800, fontSize: 16 }}
+            style={{ display: 'inline-block', padding: '14px 40px', background: 'var(--brand)', color: 'white', textDecoration: 'none', borderRadius: 12, fontWeight: 800, fontSize: 16 }}
           >
             {t('shopAgainBtn')}
           </Link>
@@ -263,7 +284,7 @@ export default function Checkout() {
 
   const inputStyle = (hasError) => ({
     width: '100%', padding: '11px 14px', borderRadius: 10,
-    border: `2px solid ${hasError ? '#e8002d' : '#e5e7eb'}`,
+    border: `2px solid ${hasError ? 'var(--brand)' : '#e5e7eb'}`,
     fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e',
     outline: 'none', boxSizing: 'border-box', background: 'white', transition: 'border-color 0.2s',
   });
@@ -289,12 +310,12 @@ export default function Checkout() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <Field label={t('fullNameLabel')} required error={errors.name}>
-                    <input value={form.name} onChange={e => update('name', e.target.value)} placeholder={t('namePlaceholder')} style={inputStyle(!!errors.name)} onFocus={e => { if (!errors.name) e.target.style.borderColor = '#e8002d'; }} onBlur={e => { if (!errors.name) e.target.style.borderColor = '#e5e7eb'; }} />
+                    <input value={form.name} onChange={e => update('name', e.target.value)} placeholder={t('namePlaceholder')} style={inputStyle(!!errors.name)} onFocus={e => { if (!errors.name) e.target.style.borderColor = 'var(--brand)'; }} onBlur={e => { if (!errors.name) e.target.style.borderColor = '#e5e7eb'; }} />
                   </Field>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <Field label={t('phoneLabel')} required error={errors.phone}>
-                    <input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder={t('phonePlaceholder')} type="tel" style={inputStyle(!!errors.phone)} onFocus={e => { if (!errors.phone) e.target.style.borderColor = '#e8002d'; }} onBlur={e => { if (!errors.phone) e.target.style.borderColor = '#e5e7eb'; }} />
+                    <input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder={t('phonePlaceholder')} type="tel" style={inputStyle(!!errors.phone)} onFocus={e => { if (!errors.phone) e.target.style.borderColor = 'var(--brand)'; }} onBlur={e => { if (!errors.phone) e.target.style.borderColor = '#e5e7eb'; }} />
                   </Field>
                 </div>
               </div>
@@ -307,20 +328,20 @@ export default function Checkout() {
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <Field label={t('cityLabel')} required error={errors.city}>
-                  <input value={form.city} onChange={e => update('city', e.target.value)} placeholder={t('cityPlaceholder')} style={inputStyle(!!errors.city)} onFocus={e => { if (!errors.city) e.target.style.borderColor = '#e8002d'; }} onBlur={e => { if (!errors.city) e.target.style.borderColor = '#e5e7eb'; }} />
+                  <input value={form.city} onChange={e => update('city', e.target.value)} placeholder={t('cityPlaceholder')} style={inputStyle(!!errors.city)} onFocus={e => { if (!errors.city) e.target.style.borderColor = 'var(--brand)'; }} onBlur={e => { if (!errors.city) e.target.style.borderColor = '#e5e7eb'; }} />
                 </Field>
                 <Field label={t('districtLabel')}>
-                  <input value={form.district} onChange={e => update('district', e.target.value)} placeholder={t('districtPlaceholder')} style={inputStyle(false)} onFocus={e => e.target.style.borderColor = '#e8002d'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+                  <input value={form.district} onChange={e => update('district', e.target.value)} placeholder={t('districtPlaceholder')} style={inputStyle(false)} onFocus={e => e.target.style.borderColor = 'var(--brand)'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
                 </Field>
                 <Field label={t('streetLabel')} required error={errors.street}>
-                  <input value={form.street} onChange={e => update('street', e.target.value)} placeholder={t('streetPlaceholder')} style={inputStyle(!!errors.street)} onFocus={e => { if (!errors.street) e.target.style.borderColor = '#e8002d'; }} onBlur={e => { if (!errors.street) e.target.style.borderColor = '#e5e7eb'; }} />
+                  <input value={form.street} onChange={e => update('street', e.target.value)} placeholder={t('streetPlaceholder')} style={inputStyle(!!errors.street)} onFocus={e => { if (!errors.street) e.target.style.borderColor = 'var(--brand)'; }} onBlur={e => { if (!errors.street) e.target.style.borderColor = '#e5e7eb'; }} />
                 </Field>
                 <Field label={t('buildingLabel')}>
-                  <input value={form.building} onChange={e => update('building', e.target.value)} placeholder={t('buildingPlaceholder')} style={inputStyle(false)} onFocus={e => e.target.style.borderColor = '#e8002d'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+                  <input value={form.building} onChange={e => update('building', e.target.value)} placeholder={t('buildingPlaceholder')} style={inputStyle(false)} onFocus={e => e.target.style.borderColor = 'var(--brand)'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
                 </Field>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <Field label={t('notesLabel')}>
-                    <textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder={t('notesPlaceholder')} rows={3} style={{ ...inputStyle(false), resize: 'vertical', fontFamily: 'Cairo, sans-serif' }} onFocus={e => e.target.style.borderColor = '#e8002d'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+                    <textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder={t('notesPlaceholder')} rows={3} style={{ ...inputStyle(false), resize: 'vertical', fontFamily: 'Cairo, sans-serif' }} onFocus={e => e.target.style.borderColor = 'var(--brand)'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
                   </Field>
                 </div>
               </div>
@@ -334,7 +355,7 @@ export default function Checkout() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20, maxHeight: 280, overflowY: 'auto' }}>
                 {items.map(item => (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, background: 'linear-gradient(135deg, #fff5f5, #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{item.emoji}</div>
+                    <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{item.emoji}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3 }} className="line-clamp-2">{item.name}</div>
                       <div style={{ fontSize: 11, color: '#9ca3af' }}>× {item.quantity}</div>
@@ -349,7 +370,7 @@ export default function Checkout() {
                 {appliedPromo ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 10, padding: '8px 12px' }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#16a34a' }}>
-                      🎟️ {appliedPromo.code} — {appliedPromo.pct}% {lang === 'ar' ? 'خصم' : 'off'}
+                      🎟️ {appliedPromo.code} — {appliedPromo.pct}% {tr('خصم', 'off', 'הנחה')}
                     </span>
                     <button type="button" onClick={removePromo} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Cairo, sans-serif', padding: '2px 6px' }}>
                       {t('removePromoBtn')}
@@ -362,8 +383,8 @@ export default function Checkout() {
                       onChange={e => { setPromoInput(e.target.value); setPromoError(''); }}
                       onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyPromo())}
                       placeholder={t('promoPlaceholder')}
-                      style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: `2px solid ${promoError ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 13, color: '#1a1a2e', outline: 'none', background: 'white' }}
-                      onFocus={e => { if (!promoError) e.target.style.borderColor = '#e8002d'; }}
+                      style={{ flex: 1, padding: '9px 12px', borderRadius: 9, border: `2px solid ${promoError ? 'var(--brand)' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 13, color: '#1a1a2e', outline: 'none', background: 'white' }}
+                      onFocus={e => { if (!promoError) e.target.style.borderColor = 'var(--brand)'; }}
                       onBlur={e => { if (!promoError) e.target.style.borderColor = '#e5e7eb'; }}
                     />
                     <button type="button" onClick={applyPromo} disabled={promoChecking} style={{ padding: '9px 14px', borderRadius: 9, border: 'none', background: promoChecking ? '#9ca3af' : '#1a1a2e', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: promoChecking ? 'wait' : 'pointer', flexShrink: 0 }}>
@@ -371,7 +392,7 @@ export default function Checkout() {
                     </button>
                   </div>
                 )}
-                {promoError && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 5, fontWeight: 600 }}>⚠ {promoError}</div>}
+                {promoError && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 5, fontWeight: 600 }}>⚠ {promoError}</div>}
               </div>
 
               <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -394,10 +415,10 @@ export default function Checkout() {
                 <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, fontWeight: 800 }}>
                     <span style={{ color: '#1a1a2e' }}>{t('totalLabel')}</span>
-                    <span style={{ color: '#e8002d' }}>{total.toFixed(2)} {t('currency')}</span>
+                    <span style={{ color: 'var(--brand)' }}>{total.toFixed(2)} {t('currency')}</span>
                   </div>
                   <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
-                    {lang === 'ar' ? '* السعر يشمل מע"מ' : '* Price includes VAT'}
+                    {tr('* السعر يشمل מע"מ', '* Price includes VAT', '* המחיר כולל מע״מ')}
                   </div>
                 </div>
               </div>

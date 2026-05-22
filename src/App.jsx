@@ -20,8 +20,8 @@ function BackToTop() {
       style={{
         position: 'fixed', bottom: 28, left: 28, zIndex: 1000,
         width: 44, height: 44, borderRadius: '50%',
-        background: '#e8002d', color: 'white', border: 'none',
-        fontSize: 20, cursor: 'pointer', boxShadow: '0 4px 16px rgba(232,0,45,0.4)',
+        background: 'var(--brand)', color: 'white', border: 'none',
+        fontSize: 20, cursor: 'pointer', boxShadow: '0 4px 16px rgba(232,138,166,0.4)',
         opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 0.25s',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -42,6 +42,7 @@ import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import InstallBanner from './components/InstallBanner';
+import Logo from './components/Logo';
 import Home from './pages/Home';
 
 // Route components are code-split — each loads as its own chunk on demand.
@@ -60,8 +61,8 @@ const Accessibility = lazy(() => import('./pages/Accessibility'));
 
 function PageLoader() {
   return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
-      🇰🇷
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Logo size={64} />
     </div>
   );
 }
@@ -82,8 +83,8 @@ function AdminRoute({ children }) {
 function AppInner() {
   const { loading } = useAuth();
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
-      🇰🇷
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Logo size={80} />
     </div>
   );
   return (

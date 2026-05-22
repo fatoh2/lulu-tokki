@@ -29,7 +29,7 @@ export default function Accessibility() {
           <div style={{ color: 'var(--text)', fontSize: 15, lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 14, padding: '16px 20px' }}>
               <p style={{ margin: 0, fontWeight: 700, color: '#16a34a', fontSize: 14 }}>
-                ✅ تلتزم هانوك سناكس بجعل موقعها الإلكتروني متاحاً لجميع المستخدمين، بما فيهم ذوو الإعاقات، وفقاً
+                ✅ تلتزم Lulu Tokki بجعل موقعها الإلكتروني متاحاً لجميع المستخدمين، بما فيهم ذوو الإعاقات، وفقاً
                 {' '}<strong>للمعيار الإسرائيلي SI 5568</strong> ومتطلبات{' '}
                 <strong>WCAG 2.1 المستوى AA</strong>.
               </p>
@@ -106,7 +106,7 @@ export default function Accessibility() {
           <div style={{ color: 'var(--text)', fontSize: 15, lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 14, padding: '16px 20px' }}>
               <p style={{ margin: 0, fontWeight: 700, color: '#16a34a', fontSize: 14 }}>
-                ✅ Hanook Snacks is committed to making its website accessible to all users, including people with disabilities, in accordance with{' '}
+                ✅ Lulu Tokki is committed to making its website accessible to all users, including people with disabilities, in accordance with{' '}
                 <strong>Israeli Standard SI 5568</strong> and <strong>WCAG 2.1 Level AA</strong>.
               </p>
             </div>

@@ -21,7 +21,7 @@ const EMPTY_FORM = {
   heat: 0, inStock: true, stock: '', tags: '', variants: [],
 };
 
-function Badge({ children, color = '#e8002d', bg = '#fff0f2' }) {
+function Badge({ children, color = 'var(--brand)', bg = 'var(--brand-soft)' }) {
   return (
     <span style={{ background: bg, color, fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap' }}>
       {children}
@@ -33,10 +33,10 @@ function Field({ label, required, error, children }) {
   return (
     <div>
       <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>
-        {label}{required && <span style={{ color: '#e8002d' }}> *</span>}
+        {label}{required && <span style={{ color: 'var(--brand)' }}> *</span>}
       </label>
       {children}
-      {error && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {error}</div>}
+      {error && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 3, fontWeight: 600 }}>⚠ {error}</div>}
     </div>
   );
 }
@@ -311,7 +311,7 @@ export default function Admin() {
 
   const inputStyle = (hasError) => ({
     width: '100%', padding: '10px 12px', borderRadius: 10,
-    border: `2px solid ${hasError ? '#e8002d' : '#e5e7eb'}`,
+    border: `2px solid ${hasError ? 'var(--brand)' : '#e5e7eb'}`,
     fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e',
     outline: 'none', boxSizing: 'border-box', background: 'white',
     transition: 'border-color 0.2s',
@@ -325,10 +325,10 @@ export default function Admin() {
         <div style={{ fontSize: 36 }}>⚙️</div>
         <div>
           <h1 style={{ fontWeight: 800, fontSize: 24, color: '#1a1a2e', margin: 0 }}>لوحة الإدارة</h1>
-          <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>إدارة منتجات متجر هانوك سناكس</p>
+          <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>إدارة منتجات متجر Lulu Tokki</p>
         </div>
         <div style={{ marginRight: 'auto' }}>
-          <Badge color="#003478" bg="#eff6ff">{products.length} منتج إجمالاً</Badge>
+          <Badge color="var(--brand-blue)" bg="#eff6ff">{products.length} منتج إجمالاً</Badge>
         </div>
       </div>
 
@@ -339,7 +339,7 @@ export default function Admin() {
             <div style={{ fontWeight: 800, fontSize: 15, color: '#92400e' }}>⚠️ قاعدة البيانات فارغة</div>
             <div style={{ fontSize: 13, color: '#92400e', marginTop: 2 }}>لا يوجد منتجات في Firestore. اضغط لتعبئتها من الملف المحلي.</div>
           </div>
-          <button onClick={handleSeed} disabled={seeding} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: seeding ? 'wait' : 'pointer', opacity: seeding ? 0.7 : 1 }}>
+          <button onClick={handleSeed} disabled={seeding} style={{ padding: '10px 22px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: seeding ? 'wait' : 'pointer', opacity: seeding ? 0.7 : 1 }}>
             {seeding ? '⏳ جاري التعبئة...' : '📦 تعبئة قاعدة البيانات'}
           </button>
         </div>
@@ -355,7 +355,7 @@ export default function Admin() {
         {[['list', '📋 المنتجات'], ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'], ['codes', '🎟️ أكواد الخصم'], ['orders', '🗂️ الطلبات'], ['analytics', '📊 الإحصاءات']].map(([key, label]) => (
           <button key={key} onClick={() => { setTab(key); if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setErrors({}); setImageFile(null); setImagePreview(''); } if (key === 'codes') { setEditingCode(null); setCodeForm({ code: '', pct: 10, active: true }); setCodeErrors({}); } if (key === 'analytics' || key === 'orders') { loadOrders(); } }} style={{
             padding: '8px 24px', borderRadius: 9, border: 'none',
-            background: tab === key ? '#e8002d' : 'transparent',
+            background: tab === key ? 'var(--brand)' : 'transparent',
             color: tab === key ? 'white' : '#6b7280',
             fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer',
             transition: 'all 0.2s',
@@ -373,7 +373,7 @@ export default function Admin() {
               type="text" placeholder="ابحث في المنتجات..."
               value={search} onChange={e => setSearch(e.target.value)}
               style={{ ...inputStyle(false), paddingRight: 38 }}
-              onFocus={e => e.target.style.borderColor = '#e8002d'}
+              onFocus={e => e.target.style.borderColor = 'var(--brand)'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
@@ -384,7 +384,7 @@ export default function Admin() {
               const count = products.filter(p => p.category === cat).length;
               return (
                 <div key={cat} style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 16px', fontSize: 13 }}>
-                  <span style={{ fontWeight: 800, color: '#e8002d', marginLeft: 6 }}>{count}</span>
+                  <span style={{ fontWeight: 800, color: 'var(--brand)', marginLeft: 6 }}>{count}</span>
                   <span style={{ color: '#6b7280', fontWeight: 600 }}>{cat}</span>
                 </div>
               );
@@ -415,7 +415,7 @@ export default function Admin() {
                 borderBottom: '1px solid #f3f4f6',
                 transition: 'background 0.15s',
               }}
-                onMouseEnter={e => e.currentTarget.style.background = '#fff5f5'}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-soft)'}
                 onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#fafafa'}
               >
                 <div style={{ fontSize: 24, textAlign: 'center' }}>{p.emoji}</div>
@@ -423,7 +423,7 @@ export default function Admin() {
                   <div style={{ fontWeight: 700, fontSize: 13, color: '#1a1a2e', lineHeight: 1.3 }}>{p.name}</div>
                   <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{p.brand} • ID: {p.id}</div>
                 </div>
-                <div><Badge color="#003478" bg="#eff6ff">{p.category}</Badge></div>
+                <div><Badge color="var(--brand-blue)" bg="#eff6ff">{p.category}</Badge></div>
                 <div style={{ fontWeight: 800, fontSize: 14, color: '#1a1a2e' }}>{p.price.toFixed(2)}</div>
                 <div style={{ fontSize: 13, color: '#f59e0b', fontWeight: 700 }}>{p.rating > 0 ? `${p.rating}★` : '—'}</div>
                 <div>
@@ -437,22 +437,22 @@ export default function Admin() {
                 <div style={{ display: 'flex', gap: 4 }}>
                   {confirmId === p.id ? (
                     <>
-                      <button onClick={() => handleRemove(p.id)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
+                      <button onClick={() => handleRemove(p.id)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
                       <button onClick={() => setConfirmId(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>إلغاء</button>
                     </>
                   ) : (
                     <>
                       <button
                         onClick={() => startEdit(p)}
-                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: '#003478', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#003478'; e.currentTarget.style.color = 'white'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = '#003478'; }}
+                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: 'var(--brand-blue)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--brand-blue)'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = 'var(--brand-blue)'; }}
                       >✏️</button>
                       <button
                         onClick={() => setConfirmId(p.id)}
-                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: '#fff5f5', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; e.currentTarget.style.color = '#e8002d'; }}
+                        style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: 'var(--brand-soft)', color: 'var(--brand)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--brand)'; e.currentTarget.style.color = 'white'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--brand-soft)'; e.currentTarget.style.color = 'var(--brand)'; }}
                       >🗑️</button>
                     </>
                   )}
@@ -483,7 +483,7 @@ export default function Admin() {
                   <input value={form.name} onChange={e => set('name', e.target.value)}
                     placeholder="مثال: رامن بلدق الحار 불닭볶음면"
                     style={inputStyle(!!errors.name)}
-                    onFocus={e => { if (!errors.name) e.target.style.borderColor = '#e8002d'; }}
+                    onFocus={e => { if (!errors.name) e.target.style.borderColor = 'var(--brand)'; }}
                     onBlur={e => { if (!errors.name) e.target.style.borderColor = '#e5e7eb'; }}
                   />
                 </Field>
@@ -496,7 +496,7 @@ export default function Admin() {
                     placeholder="جملة أو جملتان عن المنتج..."
                     rows={2}
                     style={{ ...inputStyle(!!errors.description), resize: 'vertical', fontFamily: 'Cairo, sans-serif' }}
-                    onFocus={e => { if (!errors.description) e.target.style.borderColor = '#e8002d'; }}
+                    onFocus={e => { if (!errors.description) e.target.style.borderColor = 'var(--brand)'; }}
                     onBlur={e => { if (!errors.description) e.target.style.borderColor = '#e5e7eb'; }}
                   />
                 </Field>
@@ -507,7 +507,7 @@ export default function Admin() {
                 <input type="number" min="0" step="0.01" value={form.price} onChange={e => set('price', e.target.value)}
                   placeholder="0.00"
                   style={inputStyle(!!errors.price)}
-                  onFocus={e => { if (!errors.price) e.target.style.borderColor = '#e8002d'; }}
+                  onFocus={e => { if (!errors.price) e.target.style.borderColor = 'var(--brand)'; }}
                   onBlur={e => { if (!errors.price) e.target.style.borderColor = '#e5e7eb'; }}
                 />
               </Field>
@@ -525,7 +525,7 @@ export default function Admin() {
                 <input value={form.brand} onChange={e => set('brand', e.target.value)}
                   placeholder="مثال: Samyang"
                   style={inputStyle(!!errors.brand)}
-                  onFocus={e => { if (!errors.brand) e.target.style.borderColor = '#e8002d'; }}
+                  onFocus={e => { if (!errors.brand) e.target.style.borderColor = 'var(--brand)'; }}
                   onBlur={e => { if (!errors.brand) e.target.style.borderColor = '#e5e7eb'; }}
                 />
               </Field>
@@ -535,7 +535,7 @@ export default function Admin() {
                 <input value={form.emoji} onChange={e => set('emoji', e.target.value)}
                   placeholder="🍜"
                   style={{ ...inputStyle(!!errors.emoji), fontSize: 20, textAlign: 'center' }}
-                  onFocus={e => { if (!errors.emoji) e.target.style.borderColor = '#e8002d'; }}
+                  onFocus={e => { if (!errors.emoji) e.target.style.borderColor = 'var(--brand)'; }}
                   onBlur={e => { if (!errors.emoji) e.target.style.borderColor = '#e5e7eb'; }}
                 />
               </Field>
@@ -546,7 +546,7 @@ export default function Admin() {
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     style={{ border: '2px dashed #e5e7eb', borderRadius: 12, padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'border-color 0.2s', background: '#fafafa' }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor = '#e8002d'}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--brand)'}
                     onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}
                   >
                     {imagePreview ? (
@@ -554,7 +554,7 @@ export default function Admin() {
                         <img src={imagePreview} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{imageFile?.name}</div>
-                          <div style={{ fontSize: 12, color: '#e8002d', marginTop: 4 }}>اضغط لتغيير الصورة</div>
+                          <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 4 }}>اضغط لتغيير الصورة</div>
                         </div>
                       </>
                     ) : (
@@ -576,7 +576,7 @@ export default function Admin() {
                 <input value={form.weight} onChange={e => set('weight', e.target.value)}
                   placeholder="مثال: 140g"
                   style={inputStyle(false)}
-                  onFocus={e => e.target.style.borderColor = '#e8002d'}
+                  onFocus={e => e.target.style.borderColor = 'var(--brand)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </Field>
@@ -586,7 +586,7 @@ export default function Admin() {
                 <input value={form.servings} onChange={e => set('servings', e.target.value)}
                   placeholder="مثال: حصتان"
                   style={inputStyle(false)}
-                  onFocus={e => e.target.style.borderColor = '#e8002d'}
+                  onFocus={e => e.target.style.borderColor = 'var(--brand)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </Field>
@@ -596,7 +596,7 @@ export default function Admin() {
                 <input type="number" min="0" step="1" value={form.stock} onChange={e => set('stock', e.target.value)}
                   placeholder="مثال: 10"
                   style={inputStyle(false)}
-                  onFocus={e => e.target.style.borderColor = '#e8002d'}
+                  onFocus={e => e.target.style.borderColor = 'var(--brand)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </Field>
@@ -620,7 +620,7 @@ export default function Admin() {
                   <input value={form.tags} onChange={e => set('tags', e.target.value)}
                     placeholder="حار, جديد, Samyang, كلاسيك"
                     style={inputStyle(false)}
-                    onFocus={e => e.target.style.borderColor = '#e8002d'}
+                    onFocus={e => e.target.style.borderColor = 'var(--brand)'}
                     onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                   />
                 </Field>
@@ -649,7 +649,7 @@ export default function Admin() {
                       style={{ ...inputStyle(false), width: 90, flexShrink: 0 }}
                     />
                     <button type="button" onClick={() => set('variants', form.variants.filter((_, j) => j !== i))}
-                      style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #fee2e2', background: '#fff5f5', color: '#e8002d', cursor: 'pointer', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                      style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #fee2e2', background: 'var(--brand-soft)', color: 'var(--brand)', cursor: 'pointer', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                       ✕
                     </button>
                   </div>
@@ -665,7 +665,7 @@ export default function Admin() {
               <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                 {[['inStock', 'متاح في المخزون']].map(([field, label]) => (
                   <label key={field} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div onClick={() => set(field, !form[field])} style={{ width: 48, height: 26, borderRadius: 13, cursor: 'pointer', background: form[field] ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                    <div onClick={() => set(field, !form[field])} style={{ width: 48, height: 26, borderRadius: 13, cursor: 'pointer', background: form[field] ? 'var(--brand)' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                       <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form[field] ? 4 : 24, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
                     </div>
                     <span style={{ fontWeight: 700, fontSize: 14, color: '#374151' }}>{label}</span>
@@ -678,13 +678,13 @@ export default function Admin() {
                 <div style={{ background: '#f8f9fb', borderRadius: 12, padding: 16, border: '1px dashed #e5e7eb' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', marginBottom: 10 }}>معاينة المنتج</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, #fff5f5, #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
+                    <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
                       {form.emoji || '?'}
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{form.name || 'اسم المنتج'}</div>
                       <div style={{ fontSize: 12, color: '#6b7280' }}>{form.brand || 'العلامة التجارية'} • {form.category}</div>
-                      <div style={{ fontWeight: 800, fontSize: 16, color: '#e8002d', marginTop: 2 }}>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--brand)', marginTop: 2 }}>
                         {form.price ? `${Number(form.price).toFixed(2)} ر.س` : '0.00 ر.س'}
                       </div>
                     </div>
@@ -694,9 +694,9 @@ export default function Admin() {
             </div>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 24, borderTop: '2px solid #f3f4f6', paddingTop: 20 }}>
-              <button type="submit" disabled={submitting} style={{ flex: 1, padding: '13px 20px', background: submitting ? '#9ca3af' : '#e8002d', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: submitting ? 'wait' : 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = '#b5001f'; }}
-                onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = '#e8002d'; }}
+              <button type="submit" disabled={submitting} style={{ flex: 1, padding: '13px 20px', background: submitting ? '#9ca3af' : 'var(--brand)', color: 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 15, cursor: submitting ? 'wait' : 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = 'var(--brand-dark)'; }}
+                onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = 'var(--brand)'; }}
               >
                 {submitting ? (imageFile ? '⏳ جاري رفع الصورة...' : '⏳ جاري الحفظ...') : editingId ? '💾 حفظ التعديلات' : '✅ إضافة المنتج للمتجر'}
               </button>
@@ -720,37 +720,37 @@ export default function Admin() {
             </h3>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
               <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>الكود <span style={{ color: '#e8002d' }}>*</span></label>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>الكود <span style={{ color: 'var(--brand)' }}>*</span></label>
                 <input
                   value={codeForm.code}
                   onChange={e => { setCodeForm(f => ({ ...f, code: e.target.value.toUpperCase() })); setCodeErrors(v => ({ ...v, code: '' })); }}
                   placeholder="مثال: SAVE15"
-                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.code ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 160, background: 'white', letterSpacing: 1 }}
-                  onFocus={e => { if (!codeErrors.code) e.target.style.borderColor = '#e8002d'; }}
+                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.code ? 'var(--brand)' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 160, background: 'white', letterSpacing: 1 }}
+                  onFocus={e => { if (!codeErrors.code) e.target.style.borderColor = 'var(--brand)'; }}
                   onBlur={e => { if (!codeErrors.code) e.target.style.borderColor = '#e5e7eb'; }}
                 />
-                {codeErrors.code && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.code}</div>}
+                {codeErrors.code && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.code}</div>}
               </div>
               <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>نسبة الخصم % <span style={{ color: '#e8002d' }}>*</span></label>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: 13, color: '#374151', marginBottom: 5 }}>نسبة الخصم % <span style={{ color: 'var(--brand)' }}>*</span></label>
                 <input
                   type="number" min="1" max="100"
                   value={codeForm.pct}
                   onChange={e => { setCodeForm(f => ({ ...f, pct: e.target.value })); setCodeErrors(v => ({ ...v, pct: '' })); }}
-                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.pct ? '#e8002d' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 100, background: 'white' }}
-                  onFocus={e => { if (!codeErrors.pct) e.target.style.borderColor = '#e8002d'; }}
+                  style={{ padding: '10px 12px', borderRadius: 10, border: `2px solid ${codeErrors.pct ? 'var(--brand)' : '#e5e7eb'}`, fontFamily: 'Cairo, sans-serif', fontSize: 14, color: '#1a1a2e', outline: 'none', width: 100, background: 'white' }}
+                  onFocus={e => { if (!codeErrors.pct) e.target.style.borderColor = 'var(--brand)'; }}
                   onBlur={e => { if (!codeErrors.pct) e.target.style.borderColor = '#e5e7eb'; }}
                 />
-                {codeErrors.pct && <div style={{ fontSize: 12, color: '#e8002d', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.pct}</div>}
+                {codeErrors.pct && <div style={{ fontSize: 12, color: 'var(--brand)', marginTop: 3, fontWeight: 600 }}>⚠ {codeErrors.pct}</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 2 }}>
-                <div onClick={() => setCodeForm(f => ({ ...f, active: !f.active }))} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: codeForm.active ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                <div onClick={() => setCodeForm(f => ({ ...f, active: !f.active }))} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: codeForm.active ? 'var(--brand)' : '#d1d5db', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
                   <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: codeForm.active ? 3 : 23, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
                 </div>
                 <span style={{ fontWeight: 700, fontSize: 13, color: '#374151' }}>فعّال</span>
               </div>
               <div style={{ display: 'flex', gap: 8, paddingBottom: 2 }}>
-                <button onClick={handleSaveCode} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+                <button onClick={handleSaveCode} style={{ padding: '10px 22px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
                   {editingCode ? '💾 حفظ' : '✅ إضافة'}
                 </button>
                 {editingCode && (
@@ -771,7 +771,7 @@ export default function Admin() {
                 <div style={{ fontWeight: 800, fontSize: 15, color: '#92400e' }}>لا توجد أكواد خصم بعد</div>
                 <div style={{ fontSize: 13, color: '#92400e', marginTop: 2 }}>يمكنك إضافة الأكواد يدوياً أو تعبئة الأكواد الافتراضية.</div>
               </div>
-              <button onClick={seedDefaultCodes} style={{ padding: '10px 22px', background: '#e8002d', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={seedDefaultCodes} style={{ padding: '10px 22px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
                 🎟️ إضافة الأكواد الافتراضية
               </button>
             </div>
@@ -785,33 +785,33 @@ export default function Admin() {
               </div>
               {promoCodes.map((c, i) => (
                 <div key={c.code} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, padding: '12px 20px', alignItems: 'center', background: i % 2 === 0 ? 'white' : '#fafafa', borderBottom: '1px solid #f3f4f6' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#fff5f5'}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-soft)'}
                   onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#fafafa'}
                 >
                   <span style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', letterSpacing: 1 }}>{c.code}</span>
-                  <span style={{ fontWeight: 800, fontSize: 15, color: '#e8002d' }}>{c.pct}%</span>
+                  <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--brand)' }}>{c.pct}%</span>
                   <div>
-                    <div onClick={() => toggleCodeActive(c.code, c.active)} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: c.active ? '#e8002d' : '#d1d5db', position: 'relative', transition: 'background 0.2s', display: 'inline-block' }}>
+                    <div onClick={() => toggleCodeActive(c.code, c.active)} style={{ width: 44, height: 24, borderRadius: 12, cursor: 'pointer', background: c.active ? 'var(--brand)' : '#d1d5db', position: 'relative', transition: 'background 0.2s', display: 'inline-block' }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: c.active ? 3 : 23, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     {confirmDeleteCode === c.code ? (
                       <>
-                        <button onClick={() => handleDeleteCode(c.code)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
+                        <button onClick={() => handleDeleteCode(c.code)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
                         <button onClick={() => setConfirmDeleteCode(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>إلغاء</button>
                       </>
                     ) : (
                       <>
                         <button onClick={() => { setEditingCode(c.code); setCodeForm({ code: c.code, pct: c.pct, active: c.active }); setCodeErrors({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: '#003478', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-                          onMouseEnter={e => { e.currentTarget.style.background = '#003478'; e.currentTarget.style.color = 'white'; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = '#003478'; }}
+                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: 'var(--brand-blue)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'var(--brand-blue)'; e.currentTarget.style.color = 'white'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.color = 'var(--brand-blue)'; }}
                         >✏️</button>
                         <button onClick={() => setConfirmDeleteCode(c.code)}
-                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: '#fff5f5', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-                          onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; e.currentTarget.style.color = '#e8002d'; }}
+                          style={{ padding: '6px 10px', borderRadius: 8, border: '2px solid #fee2e2', background: 'var(--brand-soft)', color: 'var(--brand)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'var(--brand)'; e.currentTarget.style.color = 'white'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'var(--brand-soft)'; e.currentTarget.style.color = 'var(--brand)'; }}
                         >🗑️</button>
                       </>
                     )}
@@ -837,8 +837,8 @@ export default function Admin() {
                 {[['all', 'الكل'], ...Object.keys(ORDER_STATUS).map(s => [s, ORDER_STATUS[s].label])].map(([key, label]) => (
                   <button key={key} onClick={() => setOrderFilter(key)} style={{
                     padding: '6px 16px', borderRadius: 20, border: '2px solid',
-                    borderColor: orderFilter === key ? '#e8002d' : '#e5e7eb',
-                    background: orderFilter === key ? '#e8002d' : 'white',
+                    borderColor: orderFilter === key ? 'var(--brand)' : '#e5e7eb',
+                    background: orderFilter === key ? 'var(--brand)' : 'white',
                     color: orderFilter === key ? 'white' : '#374151',
                     fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
                   }}>
@@ -865,7 +865,7 @@ export default function Admin() {
                             <div style={{ fontSize: 12, color: '#9ca3af', direction: 'ltr' }}>{order.phone} • {new Date(order.date).toLocaleDateString('ar-IL', { month: 'short', day: 'numeric' })}</div>
                           </div>
                           {order.address?.city && <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>📍 {order.address.city}</div>}
-                          <div style={{ fontWeight: 800, fontSize: 15, color: '#e8002d', flexShrink: 0 }}>{(order.total || 0).toFixed(2)} ₪</div>
+                          <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--brand)', flexShrink: 0 }}>{(order.total || 0).toFixed(2)} ₪</div>
                           <span style={{ fontSize: 16, color: '#9ca3af' }}>{isExpanded ? '▲' : '▼'}</span>
                         </div>
 
@@ -889,7 +889,7 @@ export default function Admin() {
                             </div>
                             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                               {sc.next && (
-                                <button onClick={() => handleUpdateStatus(order.id, sc.next)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: '#e8002d', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                <button onClick={() => handleUpdateStatus(order.id, sc.next)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                                   {ORDER_STATUS[sc.next].icon} تحديث إلى: {ORDER_STATUS[sc.next].label}
                                 </button>
                               )}
@@ -921,8 +921,8 @@ export default function Admin() {
               {/* Summary cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
                 {[
-                  { icon: '💰', label: 'إجمالي الإيرادات', value: `${aRevenue.toFixed(2)} ₪`, color: '#e8002d', bg: '#fff0f2' },
-                  { icon: '📦', label: 'إجمالي الطلبات', value: orders.length, color: '#003478', bg: '#eff6ff' },
+                  { icon: '💰', label: 'إجمالي الإيرادات', value: `${aRevenue.toFixed(2)} ₪`, color: 'var(--brand)', bg: 'var(--brand-soft)' },
+                  { icon: '📦', label: 'إجمالي الطلبات', value: orders.length, color: 'var(--brand-blue)', bg: '#eff6ff' },
                   { icon: '📊', label: 'متوسط قيمة الطلب', value: `${aAvg.toFixed(2)} ₪`, color: '#7c3aed', bg: '#f5f3ff' },
                   { icon: '👥', label: 'العملاء الفريدون', value: aCustomers, color: '#16a34a', bg: '#f0fdf4' },
                 ].map(({ icon, label, value, color, bg }) => (
@@ -949,7 +949,7 @@ export default function Admin() {
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
                         <div style={{ fontSize: 11, color: '#9ca3af' }}>{p.revenue.toFixed(2)} ₪</div>
                       </div>
-                      <Badge color="#e8002d" bg="#fff0f2">{p.qty} قطعة</Badge>
+                      <Badge color="var(--brand)" bg="var(--brand-soft)">{p.qty} قطعة</Badge>
                     </div>
                   ))}
                 </div>
@@ -963,10 +963,10 @@ export default function Admin() {
                     <div key={cat} style={{ marginBottom: 14 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 5 }}>
                         <span>{cat}</span>
-                        <span style={{ color: '#e8002d' }}>{count} قطعة</span>
+                        <span style={{ color: 'var(--brand)' }}>{count} قطعة</span>
                       </div>
                       <div style={{ height: 8, borderRadius: 4, background: '#f3f4f6', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg, #e8002d, #ff6b6b)', width: `${(count / aCatTotal) * 100}%`, transition: 'width 0.5s' }} />
+                        <div style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg, var(--brand), #ff6b6b)', width: `${(count / aCatTotal) * 100}%`, transition: 'width 0.5s' }} />
                       </div>
                     </div>
                   ))}

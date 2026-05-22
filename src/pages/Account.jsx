@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 export default function Account() {
   const { user, logout } = useAuth();
-  const { t, lang, isRTL } = useLanguage();
+  const { t, tr, isRTL } = useLanguage();
   const { wishlist } = useWishlist();
   const { products } = useProducts();
   const { addItem, updateQty } = useCart();
@@ -45,7 +45,7 @@ export default function Account() {
         <div style={{ fontSize: 72, marginBottom: 16 }}>👤</div>
         <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a1a2e', marginBottom: 16 }}>{t('signIn')}</h2>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-          <Link to="/login" style={{ display: 'inline-block', padding: '12px 28px', background: '#e8002d', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
+          <Link to="/login" style={{ display: 'inline-block', padding: '12px 28px', background: 'var(--brand)', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
             {t('loginBtn')}
           </Link>
           <Link to="/signup" style={{ display: 'inline-block', padding: '12px 28px', background: 'white', color: '#374151', borderRadius: 12, textDecoration: 'none', fontWeight: 700, fontSize: 15, border: '2px solid #e5e7eb' }}>
@@ -69,13 +69,13 @@ export default function Account() {
     });
     if (added > 0) {
       toast.success(
-        lang === 'ar' ? `✅ تمت إضافة ${added} منتج للسلة!` : `✅ ${added} item${added > 1 ? 's' : ''} added to cart!`,
+        tr(`✅ تمت إضافة ${added} منتج للسلة!`, `✅ ${added} item${added > 1 ? 's' : ''} added to cart!`, `✅ ${added} מוצרים נוספו לעגלה!`),
         { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr', fontWeight: 600 } }
       );
       navigate('/cart');
     } else {
       toast.error(
-        lang === 'ar' ? 'المنتجات غير متاحة حالياً' : 'Products are currently unavailable',
+        tr('المنتجات غير متاحة حالياً', 'Products are currently unavailable', 'המוצרים אינם זמינים כעת'),
         { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr' } }
       );
     }
@@ -84,9 +84,9 @@ export default function Account() {
   const tabStyle = (active) => ({
     padding: '10px 22px', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700,
     fontSize: 14, cursor: 'pointer', border: 'none', transition: 'all 0.2s',
-    background: active ? '#e8002d' : 'white',
+    background: active ? 'var(--brand)' : 'white',
     color: active ? 'white' : '#6b7280',
-    boxShadow: active ? '0 2px 8px rgba(232,0,45,0.3)' : '0 1px 4px rgba(0,0,0,0.06)',
+    boxShadow: active ? '0 2px 8px rgba(232,138,166,0.3)' : '0 1px 4px rgba(0,0,0,0.06)',
   });
 
   return (
@@ -95,7 +95,7 @@ export default function Account() {
       {/* Profile header */}
       <div style={{ background: 'var(--card)', borderRadius: 20, padding: '24px 28px', marginBottom: 24, boxShadow: 'var(--shadow-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 54, height: 54, borderRadius: '50%', background: 'linear-gradient(135deg, #e8002d, #003478)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 800, flexShrink: 0 }}>
+          <div style={{ width: 54, height: 54, borderRadius: '50%', background: 'linear-gradient(135deg, var(--brand), var(--brand-blue))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 800, flexShrink: 0 }}>
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -106,7 +106,7 @@ export default function Account() {
         <button
           onClick={() => { logout(); navigate('/'); }}
           style={{ padding: '9px 20px', border: '2px solid var(--border)', borderRadius: 10, background: 'var(--card)', color: 'var(--subtext)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#e8002d'; e.currentTarget.style.color = '#e8002d'; }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
         >
           {t('signOut')}
@@ -129,7 +129,7 @@ export default function Account() {
           <div style={{ textAlign: 'center', padding: '64px 20px', background: 'var(--card)', borderRadius: 20, boxShadow: 'var(--shadow-md)' }}>
             <div style={{ fontSize: 64, marginBottom: 16 }}>📦</div>
             <h3 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', margin: '0 0 8px' }}>{t('emptyHistoryMsg')}</h3>
-            <Link to="/store" style={{ display: 'inline-block', marginTop: 20, padding: '12px 28px', background: '#e8002d', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 14 }}>
+            <Link to="/store" style={{ display: 'inline-block', marginTop: 20, padding: '12px 28px', background: 'var(--brand)', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 14 }}>
               {t('browseStore')}
             </Link>
           </div>
@@ -140,7 +140,7 @@ export default function Account() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
                   <div>
                     <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 700, marginBottom: 2 }}>
-                      {t('orderDateLabel')}: {new Date(order.date).toLocaleDateString(lang === 'ar' ? 'ar-IL' : 'en-IL', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {t('orderDateLabel')}: {new Date(order.date).toLocaleDateString(tr('ar-IL', 'en-IL', 'he-IL'), { year: 'numeric', month: 'long', day: 'numeric' })}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--muted)', direction: 'ltr' }}>#{order.id}</div>
                   </div>
@@ -159,14 +159,14 @@ export default function Account() {
                   ))}
                 </div>
                 <div style={{ borderTop: '2px solid var(--border)', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                  <span style={{ fontWeight: 800, fontSize: 16, color: '#e8002d' }}>{t('totalLabel')}: {order.total.toFixed(2)} {t('currency')}</span>
+                  <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--brand)' }}>{t('totalLabel')}: {order.total.toFixed(2)} {t('currency')}</span>
                   <button
                     onClick={() => handleReorder(order)}
-                    style={{ padding: '8px 20px', borderRadius: 10, border: '2px solid #e8002d', background: 'white', color: '#e8002d', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.2s' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#e8002d'; e.currentTarget.style.color = 'white'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--card)'; e.currentTarget.style.color = '#e8002d'; }}
+                    style={{ padding: '8px 20px', borderRadius: 10, border: '2px solid var(--brand)', background: 'white', color: 'var(--brand)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--brand)'; e.currentTarget.style.color = 'white'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--card)'; e.currentTarget.style.color = 'var(--brand)'; }}
                   >
-                    {lang === 'ar' ? '🔄 إعادة الطلب' : '🔄 Reorder'}
+                    {tr('🔄 إعادة الطلب', '🔄 Reorder', '🔄 הזמנה חוזרת')}
                   </button>
                 </div>
               </div>
@@ -181,7 +181,7 @@ export default function Account() {
           <div style={{ textAlign: 'center', padding: '64px 20px', background: 'var(--card)', borderRadius: 20, boxShadow: 'var(--shadow-md)' }}>
             <div style={{ fontSize: 64, marginBottom: 16 }}>❤️</div>
             <h3 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', margin: '0 0 8px' }}>{t('emptyWishlistMsg')}</h3>
-            <Link to="/store" style={{ display: 'inline-block', marginTop: 20, padding: '12px 28px', background: '#e8002d', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 14 }}>
+            <Link to="/store" style={{ display: 'inline-block', marginTop: 20, padding: '12px 28px', background: 'var(--brand)', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 800, fontSize: 14 }}>
               {t('browseStore')}
             </Link>
           </div>

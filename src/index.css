@@ -13,6 +13,13 @@
   --shadow-sm:   0 2px 8px rgba(0,0,0,0.06);
   --shadow-md:   0 2px 12px rgba(0,0,0,0.07);
   --shadow-lg:   0 4px 20px rgba(0,0,0,0.08);
+
+  /* ── Lulu Tokki brand palette (pastel) ── */
+  --brand:        #e88aa6;
+  --brand-dark:   #d06f8f;
+  --brand-soft:   #fdeef3;
+  --brand-blue:   #8fbcd9;
+  --brand-yellow: #f2d27e;
 }
 
 [data-theme="dark"] {
@@ -29,6 +36,7 @@
   --shadow-sm:   0 2px 8px rgba(0,0,0,0.35);
   --shadow-md:   0 2px 12px rgba(0,0,0,0.45);
   --shadow-lg:   0 4px 20px rgba(0,0,0,0.55);
+  --brand-soft:  #3a2731;
 }
 
 /* Smooth theme transitions */
@@ -70,7 +78,7 @@ body {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--muted-bg); }
-::-webkit-scrollbar-thumb { background: #e8002d; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 3px; }
 
 /* Hide PWA install banner when running as installed app */
 @media (display-mode: standalone) {

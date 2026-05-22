@@ -34,7 +34,7 @@ export default function ProductCard({ product }) {
       : `Added to cart! ${product.emoji}`;
     toast.success(msg, {
       style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr', fontWeight: 600 },
-      iconTheme: { primary: '#e8002d', secondary: '#fff' },
+      iconTheme: { primary: 'var(--brand)', secondary: '#fff' },
     });
   };
 
@@ -58,7 +58,7 @@ export default function ProductCard({ product }) {
       {/* Wishlist heart */}
       <button
         onClick={handleWishlist}
-        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, background: wishlisted ? '#fff0f2' : 'var(--card)', border: `2px solid ${wishlisted ? '#e8002d' : 'var(--border)'}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, boxShadow: 'var(--shadow-sm)' }}
+        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, background: wishlisted ? 'var(--brand-soft)' : 'var(--card)', border: `2px solid ${wishlisted ? 'var(--brand)' : 'var(--border)'}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 15, boxShadow: 'var(--shadow-sm)' }}
         title={wishlisted ? t('removeFromWishlist') : t('addToWishlist')}
       >
         {wishlisted ? '❤️' : '🤍'}
@@ -67,10 +67,10 @@ export default function ProductCard({ product }) {
       {/* Badges */}
       <div style={{ position: 'absolute', top: 10, right: 10, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 1 }}>
         {product.isNew && (
-          <span style={{ background: '#003478', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeNew')}</span>
+          <span style={{ background: 'var(--brand-blue)', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeNew')}</span>
         )}
         {product.isFeatured && (
-          <span style={{ background: '#e8002d', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeFeatured')}</span>
+          <span style={{ background: 'var(--brand)', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeFeatured')}</span>
         )}
         {outOfStock && (
           <span style={{ background: '#6b7280', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>{t('badgeOutOfStock')}</span>
@@ -81,7 +81,7 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Image */}
-      <div style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%)', height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72, overflow: 'hidden' }}>
+      <div style={{ background: 'linear-gradient(135deg, var(--brand-soft) 0%, #f0f4ff 100%)', height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72, overflow: 'hidden' }}>
         {product.imageUrl
           ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           : product.emoji}
@@ -90,7 +90,7 @@ export default function ProductCard({ product }) {
       {/* Content */}
       <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 12, color: '#e8002d', fontWeight: 700, background: '#fff0f2', padding: '2px 8px', borderRadius: 6 }}>
+          <span style={{ fontSize: 12, color: 'var(--brand)', fontWeight: 700, background: 'var(--brand-soft)', padding: '2px 8px', borderRadius: 6 }}>
             {product.category}
           </span>
           {product.heat > 0 && (
@@ -127,7 +127,7 @@ export default function ProductCard({ product }) {
             onClick={e => { e.stopPropagation(); handleAdd(); }}
             disabled={outOfStock}
             style={{
-              background: outOfStock ? 'var(--muted-bg)' : inCart ? '#003478' : '#e8002d',
+              background: outOfStock ? 'var(--muted-bg)' : inCart ? 'var(--brand-blue)' : 'var(--brand)',
               color: outOfStock ? 'var(--muted)' : 'white',
               border: 'none',
               borderRadius: 10,

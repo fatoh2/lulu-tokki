@@ -10,20 +10,20 @@ const HEAT_COLORS = ['', '#f59e0b', '#f97316', '#ef4444', '#dc2626', '#991b1b'];
 
 const GALLERY_BG = {
   رامن: [
-    { decorEmoji: '', bg: 'linear-gradient(135deg, #fff0f2 0%, #fce7f3 100%)' },
+    { decorEmoji: '', bg: 'linear-gradient(135deg, var(--brand-soft) 0%, #fce7f3 100%)' },
     { decorEmoji: '🥢', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
     { decorEmoji: '🫙', bg: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' },
     { decorEmoji: '📦', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
   ],
   رقائق: [
     { decorEmoji: '', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
-    { decorEmoji: '🫙', bg: 'linear-gradient(135deg, #fff0f2 0%, #fce7f3 100%)' },
+    { decorEmoji: '🫙', bg: 'linear-gradient(135deg, var(--brand-soft) 0%, #fce7f3 100%)' },
     { decorEmoji: '🧂', bg: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' },
     { decorEmoji: '📦', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
   ],
   حلوى: [
     { decorEmoji: '', bg: 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)' },
-    { decorEmoji: '🎁', bg: 'linear-gradient(135deg, #fff0f2 0%, #fce7f3 100%)' },
+    { decorEmoji: '🎁', bg: 'linear-gradient(135deg, var(--brand-soft) 0%, #fce7f3 100%)' },
     { decorEmoji: '✨', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
     { decorEmoji: '🎀', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
   ],
@@ -36,7 +36,7 @@ const GALLERY_BG = {
   بسكويت: [
     { decorEmoji: '', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
     { decorEmoji: '☕', bg: 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)' },
-    { decorEmoji: '🫙', bg: 'linear-gradient(135deg, #fff0f2 0%, #fce7f3 100%)' },
+    { decorEmoji: '🫙', bg: 'linear-gradient(135deg, var(--brand-soft) 0%, #fce7f3 100%)' },
     { decorEmoji: '🎁', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
   ],
 };
@@ -46,7 +46,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { products } = useProducts();
   const { addItem, items, updateQty } = useCart();
-  const { t, lang, isRTL } = useLanguage();
+  const { t, tr, isRTL } = useLanguage();
   const [activePhoto, setActivePhoto] = useState(0);
   const [qty, setQty] = useState(1);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
@@ -75,7 +75,7 @@ export default function ProductDetail() {
       <div style={{ maxWidth: 500, margin: '80px auto', textAlign: 'center', padding: '0 20px' }}>
         <div style={{ fontSize: 64 }}>😕</div>
         <h2 style={{ fontWeight: 800, color: '#1a1a2e', marginBottom: 8 }}>{t('productNotFound')}</h2>
-        <Link to="/store" style={{ display: 'inline-block', marginTop: 16, padding: '12px 28px', background: '#e8002d', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 700 }}>
+        <Link to="/store" style={{ display: 'inline-block', marginTop: 16, padding: '12px 28px', background: 'var(--brand)', color: 'white', borderRadius: 12, textDecoration: 'none', fontWeight: 700 }}>
           {t('backToStoreBtn')}
         </Link>
       </div>
@@ -102,30 +102,40 @@ export default function ProductDetail() {
       for (let i = 0; i < qty; i++) addItem(product, activeVariant);
     }
     const label = activeVariant ? ` (${activeVariant.label})` : '';
-    const msg = lang === 'ar'
-      ? `تمت إضافة ${qty} إلى السلة! ${product.emoji}${label}`
-      : `Added ${qty} to cart! ${product.emoji}${label}`;
+    const msg = tr(
+      `تمت إضافة ${qty} إلى السلة! ${product.emoji}${label}`,
+      `Added ${qty} to cart! ${product.emoji}${label}`,
+      `${qty} נוספו לעגלה! ${product.emoji}${label}`,
+    );
     toast.success(msg, {
       style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr', fontWeight: 600 },
-      iconTheme: { primary: '#e8002d', secondary: '#fff' },
+      iconTheme: { primary: 'var(--brand)', secondary: '#fff' },
     });
   };
 
-  const addToCartLabel = lang === 'ar'
-    ? (qty > 1 ? `🛒 أضف ${qty} قطع للسلة` : '🛒 أضف للسلة')
-    : (qty > 1 ? `🛒 Add ${qty} to Cart` : '🛒 Add to Cart');
+  const addToCartLabel = tr(
+    (qty > 1 ? `🛒 أضف ${qty} قطع للسلة` : '🛒 أضف للسلة'),
+    (qty > 1 ? `🛒 Add ${qty} to Cart` : '🛒 Add to Cart'),
+    (qty > 1 ? `🛒 הוספת ${qty} לעגלה` : '🛒 הוספה לעגלה'),
+  );
 
-  const inCartBadge = lang === 'ar'
-    ? `✓ ${inCart?.quantity} في السلة`
-    : `✓ ${inCart?.quantity} in cart`;
+  const inCartBadge = tr(
+    `✓ ${inCart?.quantity} في السلة`,
+    `✓ ${inCart?.quantity} in cart`,
+    `✓ ${inCart?.quantity} בעגלה`,
+  );
 
-  const heatLevelText = lang === 'ar'
-    ? `مستوى ${product.heat}/5`
-    : `Level ${product.heat}/5`;
+  const heatLevelText = tr(
+    `مستوى ${product.heat}/5`,
+    `Level ${product.heat}/5`,
+    `רמה ${product.heat}/5`,
+  );
 
-  const relatedTitle = lang === 'ar'
-    ? `منتجات مشابهة في فئة ${product.category}`
-    : `Similar Products in ${product.category}`;
+  const relatedTitle = tr(
+    `منتجات مشابهة في فئة ${product.category}`,
+    `Similar Products in ${product.category}`,
+    `מוצרים דומים בקטגוריה ${product.category}`,
+  );
 
   const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
 
@@ -172,18 +182,18 @@ export default function ProductDetail() {
               {views[activePhoto].label}
             </div>
             <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 6 }}>
-              {product.isNew && <span style={{ background: '#003478', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeNew')}</span>}
-              {product.isFeatured && <span style={{ background: '#e8002d', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeFeatured')}</span>}
+              {product.isNew && <span style={{ background: 'var(--brand-blue)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeNew')}</span>}
+              {product.isFeatured && <span style={{ background: 'var(--brand)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeFeatured')}</span>}
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
             {views.map((view, i) => (
-              <button key={i} onClick={() => setActivePhoto(i)} style={{ borderRadius: 12, background: view.bg, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, border: `2px solid ${activePhoto === i ? '#e8002d' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.2s', outline: 'none', boxShadow: activePhoto === i ? '0 0 0 3px rgba(232,0,45,0.15)' : 'none', overflow: 'hidden', padding: 0, position: 'relative' }}>
+              <button key={i} onClick={() => setActivePhoto(i)} style={{ borderRadius: 12, background: view.bg, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, border: `2px solid ${activePhoto === i ? 'var(--brand)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.2s', outline: 'none', boxShadow: activePhoto === i ? '0 0 0 3px rgba(232,138,166,0.15)' : 'none', overflow: 'hidden', padding: 0, position: 'relative' }}>
                 {product.imageUrl && i === 0
                   ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <>
                       <span style={{ fontSize: 28 }}>{product.emoji}</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: activePhoto === i ? '#e8002d' : '#6b7280' }}>{view.label}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: activePhoto === i ? 'var(--brand)' : '#6b7280' }}>{view.label}</span>
                     </>
                 }
               </button>
@@ -194,10 +204,10 @@ export default function ProductDetail() {
         {/* Product Info */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ background: '#fff0f2', color: '#e8002d', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.category}</span>
-            <span style={{ background: '#eff6ff', color: '#003478', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.brand}</span>
+            <span style={{ background: 'var(--brand-soft)', color: 'var(--brand)', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.category}</span>
+            <span style={{ background: '#eff6ff', color: 'var(--brand-blue)', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{product.brand}</span>
             {outOfStock && <span style={{ background: '#f3f4f6', color: '#6b7280', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>{t('outOfStockBadge')}</span>}
-            {lowStock && <span style={{ background: '#fff7ed', color: '#f97316', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>🔥 {lang === 'ar' ? `بقي ${product.stock} فقط!` : `Only ${product.stock} left!`}</span>}
+            {lowStock && <span style={{ background: '#fff7ed', color: '#f97316', fontSize: 13, fontWeight: 700, padding: '4px 12px', borderRadius: 8 }}>🔥 {tr(`بقي ${product.stock} فقط!`, `Only ${product.stock} left!`, `נותרו ${product.stock} בלבד!`)}</span>}
           </div>
 
           <h1 style={{ fontWeight: 800, fontSize: 26, color: 'var(--text)', margin: 0, lineHeight: 1.3 }}>{product.name}</h1>
@@ -218,7 +228,7 @@ export default function ProductDetail() {
           )}
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-            <span style={{ fontWeight: 900, fontSize: 36, color: '#e8002d' }}>{displayPrice.toFixed(2)}</span>
+            <span style={{ fontWeight: 900, fontSize: 36, color: 'var(--brand)' }}>{displayPrice.toFixed(2)}</span>
             <span style={{ fontWeight: 700, fontSize: 16, color: '#6b7280' }}>{t('currency')}</span>
             {activeVariant && activeVariant.discountPct > 0 && (
               <span style={{ fontSize: 13, color: '#9ca3af', textDecoration: 'line-through', marginInlineStart: 4 }}>
@@ -226,7 +236,7 @@ export default function ProductDetail() {
               </span>
             )}
             {inCart && (
-              <span style={{ marginInlineStart: 8, fontSize: 13, color: '#003478', fontWeight: 700, background: '#eff6ff', padding: '3px 10px', borderRadius: 6 }}>
+              <span style={{ marginInlineStart: 8, fontSize: 13, color: 'var(--brand-blue)', fontWeight: 700, background: '#eff6ff', padding: '3px 10px', borderRadius: 6 }}>
                 {inCartBadge}
               </span>
             )}
@@ -236,7 +246,7 @@ export default function ProductDetail() {
           {variants.length > 0 && (
             <div>
               <div style={{ fontWeight: 700, fontSize: 14, color: '#374151', marginBottom: 10 }}>
-                {lang === 'ar' ? 'اختر الحجم:' : 'Choose size:'}
+                {tr('اختر الحجم:', 'Choose size:', 'בחרו גודל:')}
               </div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {variants.map((v, i) => {
@@ -244,12 +254,12 @@ export default function ProductDetail() {
                   const isActive = selectedVariantIdx === i;
                   return (
                     <button key={v.label} onClick={() => setSelectedVariantIdx(i)} style={{
-                      padding: '10px 18px', borderRadius: 12, border: `2px solid ${isActive ? '#e8002d' : '#e5e7eb'}`,
-                      background: isActive ? '#fff0f2' : 'var(--card)', cursor: 'pointer', textAlign: 'center',
+                      padding: '10px 18px', borderRadius: 12, border: `2px solid ${isActive ? 'var(--brand)' : '#e5e7eb'}`,
+                      background: isActive ? 'var(--brand-soft)' : 'var(--card)', cursor: 'pointer', textAlign: 'center',
                       fontFamily: 'Cairo, sans-serif', transition: 'all 0.15s', minWidth: 80,
                     }}>
-                      <div style={{ fontWeight: 800, fontSize: 14, color: isActive ? '#e8002d' : '#1a1a2e' }}>{v.label}</div>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: isActive ? '#e8002d' : '#6b7280', marginTop: 2 }}>{vPrice.toFixed(2)} {t('currency')}</div>
+                      <div style={{ fontWeight: 800, fontSize: 14, color: isActive ? 'var(--brand)' : '#1a1a2e' }}>{v.label}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: isActive ? 'var(--brand)' : '#6b7280', marginTop: 2 }}>{vPrice.toFixed(2)} {t('currency')}</div>
                       {v.discountPct > 0 && (
                         <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, marginTop: 2 }}>-{v.discountPct}%</div>
                       )}
@@ -273,7 +283,7 @@ export default function ProductDetail() {
             <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 12, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 18 }}>⏳</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: '#c2410c' }}>
-                {lang === 'ar' ? `بقي ${product.stock} قطعة فقط في المخزن!` : `Only ${product.stock} left in stock!`}
+                {tr(`بقي ${product.stock} قطعة فقط في المخزن!`, `Only ${product.stock} left in stock!`, `נותרו ${product.stock} פריטים בלבד במלאי!`)}
               </span>
             </div>
           )}
@@ -285,7 +295,7 @@ export default function ProductDetail() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--card)', borderRadius: 12, border: '2px solid var(--border)', overflow: 'hidden' }}>
                 <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#374151', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>−</button>
                 <span style={{ fontWeight: 800, fontSize: 18, minWidth: 40, textAlign: 'center', color: '#1a1a2e' }}>{qty}</span>
-                <button onClick={() => setQty(q => q + 1)} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#e8002d', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>+</button>
+                <button onClick={() => setQty(q => q + 1)} style={{ width: 42, height: 42, border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--brand)', fontWeight: 700, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-soft)'} onMouseLeave={e => e.currentTarget.style.background = 'none'}>+</button>
               </div>
               <span style={{ fontSize: 14, color: '#9ca3af', fontWeight: 600 }}>= {(displayPrice * qty).toFixed(2)} {t('currency')}</span>
             </div>
@@ -293,13 +303,13 @@ export default function ProductDetail() {
               <button
                 onClick={handleAddToCart}
                 disabled={outOfStock}
-                style={{ flex: 1, padding: '14px 20px', background: outOfStock ? '#e5e7eb' : '#e8002d', color: outOfStock ? '#9ca3af' : 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: outOfStock ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={e => { if (!outOfStock) e.currentTarget.style.background = '#b5001f'; }}
-                onMouseLeave={e => { if (!outOfStock) e.currentTarget.style.background = '#e8002d'; }}
+                style={{ flex: 1, padding: '14px 20px', background: outOfStock ? '#e5e7eb' : 'var(--brand)', color: outOfStock ? '#9ca3af' : 'white', border: 'none', borderRadius: 12, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: outOfStock ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => { if (!outOfStock) e.currentTarget.style.background = 'var(--brand-dark)'; }}
+                onMouseLeave={e => { if (!outOfStock) e.currentTarget.style.background = 'var(--brand)'; }}
               >
                 {outOfStock ? t('unavailableBtn') : addToCartLabel}
               </button>
-              <Link to="/cart" style={{ padding: '14px 20px', borderRadius: 12, border: '2px solid #e8002d', color: '#e8002d', textDecoration: 'none', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+              <Link to="/cart" style={{ padding: '14px 20px', borderRadius: 12, border: '2px solid var(--brand)', color: 'var(--brand)', textDecoration: 'none', fontWeight: 800, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s', whiteSpace: 'nowrap' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-soft)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 {t('viewCartBtn')}
               </Link>
             </div>
@@ -335,7 +345,7 @@ export default function ProductDetail() {
         <div style={{ marginTop: 60 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <h2 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', margin: 0 }}>{relatedTitle}</h2>
-            <Link to="/store" style={{ color: '#e8002d', textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+            <Link to="/store" style={{ color: 'var(--brand)', textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
               {t('viewAllLink')} ←
             </Link>
           </div>
@@ -349,7 +359,7 @@ export default function ProductDetail() {
       {recentlyViewed.length > 0 && (
         <div style={{ marginTop: 60 }}>
           <h2 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', marginBottom: 20 }}>
-            {lang === 'ar' ? '🕐 شاهدتها مؤخراً' : '🕐 Recently Viewed'}
+            {tr('🕐 شاهدتها مؤخراً', '🕐 Recently Viewed', '🕐 נצפו לאחרונה')}
           </h2>
           <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
             {recentlyViewed.map(p => (
@@ -362,11 +372,11 @@ export default function ProductDetail() {
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
                 >
-                  <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, #fff5f5, #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
+                  <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
                     {p.imageUrl ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
                   </div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
-                  <div style={{ fontWeight: 800, fontSize: 14, color: '#e8002d' }}>{p.price.toFixed(2)} {t('currency')}</div>
+                  <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--brand)' }}>{p.price.toFixed(2)} {t('currency')}</div>
                 </div>
               </Link>
             ))}
