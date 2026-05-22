@@ -74,7 +74,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Logo size={46} />
+          <Logo size={72} />
           <span style={{ fontWeight: 900, fontSize: 19, background: 'linear-gradient(135deg, var(--brand), var(--brand-blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>Lulu Tokki</span>
         </Link>
 

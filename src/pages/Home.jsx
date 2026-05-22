@@ -58,7 +58,7 @@ export default function Home() {
       }}>
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
           <div style={{ marginBottom: 18, display: 'flex', justifyContent: 'center' }}>
-            <Logo size={160} />
+            <Logo size={340} />
           </div>
           <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
             {t('heroTitle')}
