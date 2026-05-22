@@ -49,7 +49,7 @@ export default function Footer() {
             {/* Business identity */}
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', lineHeight: 1.7 }}>
               <div>{tr('ע.מ. / ח.פ.: 000000000', 'Reg. No.: 000000000', 'ע.מ. / ח.פ.: 000000000')}</div>
-              <div>{tr('باقة الغربية، إسرائيل', 'Baqa al-Gharbiyye, Israel', 'באקה אל-ע׳רביה, ישראל')}</div>
+              <div>{tr('باقة الغربية', 'Baqa al-Gharbiyye', 'באקה אל-ע׳רביה')}</div>
             </div>
             {/* VAT note */}
             <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: '5px 10px', display: 'inline-block' }}>
