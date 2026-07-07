@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { auth, db } from '../../firebase';
 import toast from 'react-hot-toast';
 import AdminField from './AdminField';
 import { inputStyle, EMPTY_FORM, toastStyle } from './adminStyles';
 import { translateArToEnHe } from '../../utils/translate';
+
+const IMAGE_UPLOAD_URL = import.meta.env.VITE_IMAGE_UPLOAD_URL;
 
 export default function ProductFormTab({
   products, editingId, setEditingId, form, setForm, onSwitchToList, addProduct, updateProduct,
@@ -101,9 +101,20 @@ export default function ProductFormTab({
       let imageUrl = imagePreview && !imageFile ? imagePreview : '';
       if (imageFile) {
         const targetId = editingId ?? (products.reduce((max, p) => Math.max(max, p.id), 0) + 1);
-        const imgRef = storageRef(storage, `product-images/${targetId}`);
-        await uploadBytes(imgRef, imageFile);
-        imageUrl = await getDownloadURL(imgRef);
+        const idToken = await auth.currentUser.getIdToken();
+        const body = new FormData();
+        body.append('file', imageFile);
+        body.append('key', `product-images/${targetId}`);
+        const res = await fetch(IMAGE_UPLOAD_URL, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+          body,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'فشل رفع الصورة');
+        }
+        ({ url: imageUrl } = await res.json());
       }
       const stockVal = form.stock !== '' ? Number(form.stock) : null;
       const data = {

@@ -1,0 +1,13 @@
+name = "korean-snacks-image-upload"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "korean-snacks-images"
+
+[vars]
+FIREBASE_PROJECT_ID = "korean-snacks"
+ADMIN_EMAILS = "fatoh.haj@gmail.com,noorabutamam304@gmail.com"
+R2_PUBLIC_URL = "https://pub-9ae5576bc28b492292cd7f64e85d77e0.r2.dev"
+ALLOWED_ORIGIN = "https://lulu-tokki.vercel.app"
