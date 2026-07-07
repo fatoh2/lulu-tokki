@@ -1,4 +1,5 @@
 import { useReducer, useEffect } from 'react';
+import { useProducts } from './ProductsContext';
 import { CartContext } from './CartContext';
 
 function cartReducer(state, action) {
@@ -12,7 +13,7 @@ function cartReducer(state, action) {
       if (existing) {
         return state.map(i =>
           i.id === product.id
-            ? { ...i, price, variant: variant ?? null, quantity: i.quantity + 1 }
+            ? { ...i, ...product, price, variant: variant ?? null, quantity: i.quantity + 1 }
             : i
         );
       }
@@ -27,6 +28,13 @@ function cartReducer(state, action) {
       );
     case 'CLEAR':
       return [];
+    case 'SYNC_PRODUCTS': {
+      const byId = new Map(action.products.map(p => [p.id, p]));
+      return state.map(i => {
+        const fresh = byId.get(i.id);
+        return fresh ? { ...i, ...fresh, price: i.price, variant: i.variant, quantity: i.quantity } : i;
+      });
+    }
     default:
       return state;
   }
@@ -43,10 +51,15 @@ function getInitialCart() {
 
 export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, [], getInitialCart);
+  const { products } = useProducts();
 
   useEffect(() => {
     localStorage.setItem('hanook-cart', JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    if (products.length) dispatch({ type: 'SYNC_PRODUCTS', products });
+  }, [products]);
 
   const addItem = (product, variant = null) => dispatch({ type: 'ADD_ITEM', product, variant });
   const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id });
