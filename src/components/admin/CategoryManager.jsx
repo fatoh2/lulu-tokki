@@ -39,7 +39,12 @@ export default function CategoryManager() {
         setLoading(false);
       }
     };
-    load();
+    load().catch(() => {
+      if (active) {
+        setCategories(DEFAULT_CATEGORIES);
+        setLoading(false);
+      }
+    });
     return () => { active = false; };
   }, []);
 

@@ -21,13 +21,14 @@ export default function ProductFormTab({
   const translateTimer = useRef(null);
 
   useEffect(() => {
+    const fallback = () => setCategories([{ name: 'رامن' }, { name: 'رقائق' }, { name: 'حلوى' }, { name: 'مشروبات' }, { name: 'بسكويت' }]);
     getDocs(collection(db, 'categories')).then(snap => {
       const arr = [];
       snap.forEach(d => arr.push({ name: d.id, ...d.data() }));
       arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
       if (arr.length) setCategories(arr);
-      else setCategories([{ name: 'رامن' }, { name: 'رقائق' }, { name: 'حلوى' }, { name: 'مشروبات' }, { name: 'بسكويت' }]);
-    });
+      else fallback();
+    }).catch(fallback);
   }, []);
 
   useEffect(() => {
