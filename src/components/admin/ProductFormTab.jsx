@@ -78,7 +78,6 @@ export default function ProductFormTab({
     if (!form.description.trim()) e.description = 'الوصف مطلوب';
     if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) e.price = 'سعر صحيح مطلوب';
     if (!form.brand.trim()) e.brand = 'العلامة التجارية مطلوبة';
-    if (!form.emoji.trim()) e.emoji = 'الرمز مطلوب';
     return e;
   };
 
@@ -92,7 +91,11 @@ export default function ProductFormTab({
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast.error(Object.values(errs)[0], { style: toastStyle });
+      return;
+    }
     setSubmitting(true);
     try {
       let imageUrl = imagePreview && !imageFile ? imagePreview : '';
@@ -261,11 +264,11 @@ export default function ProductFormTab({
           </AdminField>
 
           {/* Emoji */}
-          <AdminField label="الرمز (إيموجي)" required error={errors.emoji}>
+          <AdminField label="الرمز (إيموجي)">
             <input value={form.emoji} onChange={e => set('emoji', e.target.value)}
-              placeholder="🍜" style={{ ...inputStyle(!!errors.emoji), fontSize: 20, textAlign: 'center' }}
-              onFocus={e => { if (!errors.emoji) e.target.style.borderColor = 'var(--brand)'; }}
-              onBlur={e => { if (!errors.emoji) e.target.style.borderColor = '#e5e7eb'; }}
+              placeholder="🍜" style={{ ...inputStyle(false), fontSize: 20, textAlign: 'center' }}
+              onFocus={e => e.target.style.borderColor = 'var(--brand)'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'}
             />
           </AdminField>
 

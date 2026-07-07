@@ -14,6 +14,7 @@ export default function ProductsListTab({
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkPct, setBulkPct] = useState('');
   const [showCategories, setShowCategories] = useState(false);
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
 
   const filtered = products.filter(p => {
     if (!search.trim()) return true;
@@ -90,6 +91,14 @@ export default function ProductsListTab({
     setConfirmId(null);
   };
 
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    await Promise.all(ids.map(id => onRemove(id)));
+    toast.success(`تم حذف ${ids.length} منتج 🗑️`, { style: toastStyle });
+    setSelectedIds(new Set());
+    setConfirmBulkDelete(false);
+  };
+
   const catNames = categories.map(c => c.name);
 
   return (
@@ -134,8 +143,8 @@ export default function ProductsListTab({
       </div>
 
       {/* Table */}
-      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '36px 50px 1fr 100px 80px 80px 100px 120px 60px', gap: 0, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 16px', fontSize: 12, fontWeight: 800, color: '#6b7280', alignItems: 'center' }}>
+      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflowX: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '36px 50px 220px 100px 80px 80px 100px 120px 60px', gap: 0, minWidth: 906, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 16px', fontSize: 12, fontWeight: 800, color: '#6b7280', alignItems: 'center' }}>
           <span>
             <input type="checkbox" checked={selectedIds.size === filtered.length && filtered.length > 0} onChange={toggleAll} style={{ cursor: 'pointer' }} />
           </span>
@@ -155,8 +164,8 @@ export default function ProductsListTab({
           </div>
         ) : filtered.map((p, i) => (
           <div key={p.id} style={{
-            display: 'grid', gridTemplateColumns: '36px 50px 1fr 100px 80px 80px 100px 120px 60px',
-            gap: 0, padding: '12px 16px', alignItems: 'center',
+            display: 'grid', gridTemplateColumns: '36px 50px 220px 100px 80px 80px 100px 120px 60px',
+            gap: 0, minWidth: 906, padding: '12px 16px', alignItems: 'center',
             background: selectedIds.has(p.id) ? 'var(--brand-soft)' : i % 2 === 0 ? 'white' : '#fafafa',
             borderBottom: '1px solid #f3f4f6', transition: 'background 0.15s',
           }}
@@ -239,7 +248,31 @@ export default function ProductsListTab({
           }}>
             💰 تحديث الأسعار
           </button>
-          <button onClick={() => { setSelectedIds(new Set()); setBulkPct(''); }} style={{
+          {confirmBulkDelete ? (
+            <>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--brand)' }}>تأكيد حذف {selectedIds.size} منتج؟</span>
+              <button onClick={handleBulkDelete} style={{
+                padding: '10px 18px', background: 'var(--brand)', color: 'white', border: 'none',
+                borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 13, cursor: 'pointer',
+              }}>
+                تأكيد
+              </button>
+              <button onClick={() => setConfirmBulkDelete(false)} style={{
+                padding: '10px 18px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb',
+                borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+              }}>
+                إلغاء
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setConfirmBulkDelete(true)} style={{
+              padding: '10px 18px', background: 'var(--brand-soft)', color: 'var(--brand)', border: '2px solid #fee2e2',
+              borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 13, cursor: 'pointer',
+            }}>
+              🗑️ حذف المحدد
+            </button>
+          )}
+          <button onClick={() => { setSelectedIds(new Set()); setBulkPct(''); setConfirmBulkDelete(false); }} style={{
             padding: '10px 18px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb',
             borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>
