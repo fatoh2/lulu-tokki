@@ -128,6 +128,8 @@ export default function ProductFormTab({
       setImagePreview('');
       setEditingId(null);
       onSwitchToList();
+    } catch (err) {
+      toast.error(`فشل الحفظ: ${err.message}`, { style: toastStyle });
     } finally {
       setSubmitting(false);
     }
