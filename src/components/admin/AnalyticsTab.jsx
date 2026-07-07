@@ -2,8 +2,10 @@ import { useState, useMemo } from 'react';
 import AdminBadge from './AdminBadge';
 import { inputStyle } from './adminStyles';
 import DailyRevenueChart from './DailyRevenueChart';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export default function AnalyticsTab({ orders, products, loading, loaded }) {
+  const isMobile = useIsMobile();
   const [dateRange, setDateRange] = useState('all');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
@@ -108,7 +110,7 @@ export default function AnalyticsTab({ orders, products, loading, loaded }) {
         <DailyRevenueChart orders={filteredOrders} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
         {/* Top 5 products */}
         <div style={{ background: 'white', borderRadius: 16, padding: 22, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
           <h3 style={{ fontWeight: 800, fontSize: 15, color: '#1a1a2e', marginTop: 0, marginBottom: 18 }}>🏆 أكثر 5 منتجات مبيعاً</h3>

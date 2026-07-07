@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
 import { productName } from '../utils/productName';
+import { useIsMobile } from '../hooks/useIsMobile';
 import toast from 'react-hot-toast';
 
 const HEAT_COLORS = ['', '#f59e0b', '#f97316', '#ef4444', '#dc2626', '#991b1b'];
@@ -41,16 +42,6 @@ const GALLERY_BG = {
     { decorEmoji: '🎁', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
   ],
 };
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-  return isMobile;
-}
 
 export default function ProductDetail() {
   const { id } = useParams();

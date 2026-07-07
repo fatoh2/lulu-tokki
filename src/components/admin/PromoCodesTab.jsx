@@ -120,12 +120,12 @@ export default function PromoCodesTab() {
           <button onClick={seedDefaults} style={{ padding: '10px 22px', background: 'var(--brand)', color: 'white', border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>🎟️ إضافة الأكواد الافتراضية</button>
         </div>
       ) : (
-        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 20px', fontSize: 12, fontWeight: 800, color: '#6b7280' }}>
+        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflowX: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, minWidth: 460, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 20px', fontSize: 12, fontWeight: 800, color: '#6b7280' }}>
             <span>الكود</span><span>الخصم</span><span>الحالة</span><span>إجراء</span>
           </div>
           {promoCodes.map((c, i) => (
-            <div key={c.code} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, padding: '12px 20px', alignItems: 'center', background: i % 2 === 0 ? 'white' : '#fafafa', borderBottom: '1px solid #f3f4f6' }}
+            <div key={c.code} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 100px 120px', gap: 0, minWidth: 460, padding: '12px 20px', alignItems: 'center', background: i % 2 === 0 ? 'white' : '#fafafa', borderBottom: '1px solid #f3f4f6' }}
               onMouseEnter={e => e.currentTarget.style.background = 'var(--brand-soft)'}
               onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#fafafa'}
             >

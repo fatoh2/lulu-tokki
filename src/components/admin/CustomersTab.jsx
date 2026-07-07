@@ -85,8 +85,8 @@ export default function CustomersTab({ orders, loading, loaded }) {
       </div>
 
       {/* Table */}
-      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px 120px 120px', gap: 0, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 20px', fontSize: 12, fontWeight: 800, color: '#6b7280' }}>
+      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflowX: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px 120px 120px', gap: 0, minWidth: 640, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 20px', fontSize: 12, fontWeight: 800, color: '#6b7280' }}>
           <span onClick={() => toggleSort('name')} style={{ cursor: 'pointer' }}>الزبون{sortIcon('name')}</span>
           <span>الهاتف</span>
           <span onClick={() => toggleSort('orders')} style={{ cursor: 'pointer' }}>الطلبات{sortIcon('orders')}</span>
@@ -99,7 +99,7 @@ export default function CustomersTab({ orders, loading, loaded }) {
         ) : filtered.map((c, i) => (
           <div key={c.phone} style={{
             display: 'grid', gridTemplateColumns: '1fr 140px 100px 120px 120px',
-            gap: 0, padding: '12px 20px', alignItems: 'center',
+            gap: 0, minWidth: 640, padding: '12px 20px', alignItems: 'center',
             background: i % 2 === 0 ? 'white' : '#fafafa',
             borderBottom: '1px solid #f3f4f6',
           }}

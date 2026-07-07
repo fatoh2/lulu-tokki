@@ -1,18 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-  return isMobile;
-}
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { db } from '../firebase';
 import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
@@ -331,7 +322,7 @@ export default function Checkout() {
               <h3 style={{ fontWeight: 800, fontSize: 17, color: '#1a1a2e', marginTop: 0, marginBottom: 20, paddingBottom: 12, borderBottom: '2px solid #f3f4f6' }}>
                 {t('addressTitle')}
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
                 <Field label={t('cityLabel')} required error={errors.city}>
                   <input value={form.city} onChange={e => update('city', e.target.value)} placeholder={t('cityPlaceholder')} style={inputStyle(!!errors.city)} onFocus={e => { if (!errors.city) e.target.style.borderColor = 'var(--brand)'; }} onBlur={e => { if (!errors.city) e.target.style.borderColor = '#e5e7eb'; }} />
                 </Field>

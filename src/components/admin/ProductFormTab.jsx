@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import AdminField from './AdminField';
 import { inputStyle, EMPTY_FORM, toastStyle } from './adminStyles';
 import { translateArToEnHe } from '../../utils/translate';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const IMAGE_UPLOAD_URL = import.meta.env.VITE_IMAGE_UPLOAD_URL;
 
@@ -19,6 +20,7 @@ export default function ProductFormTab({
   const [categories, setCategories] = useState([]);
   const [translating, setTranslating] = useState(false);
   const translateTimer = useRef(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fallback = () => setCategories([{ name: 'رامن' }, { name: 'رقائق' }, { name: 'حلوى' }, { name: 'مشروبات' }, { name: 'بسكويت' }]);
@@ -160,7 +162,7 @@ export default function ProductFormTab({
           {editingId ? '✏️ تعديل المنتج' : '➕ إضافة منتج جديد'}
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
 
           {/* === Multilingual Name Section === */}
           <div style={{ gridColumn: '1 / -1', background: '#f8f9fb', borderRadius: 14, padding: '18px 20px', border: '1px solid #e5e7eb', marginBottom: 4 }}>
@@ -170,7 +172,7 @@ export default function ProductFormTab({
               {translating && <span style={{ fontSize: 12, color: '#6b7280', marginRight: 'auto' }}>⏳ جاري الترجمة...</span>}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
               {/* Arabic Name */}
               <AdminField label="🇸🇦 الاسم بالعربية" required error={errors.nameAr}>
                 <input value={form.nameAr}
