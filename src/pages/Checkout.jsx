@@ -162,7 +162,7 @@ export default function Checkout() {
         phone: form.phone,
         address: { city: form.city, district: form.district, street: form.street, building: form.building },
         notes: form.notes || '',
-        items: items.map(({ id, name, emoji, price, quantity, variant }) => ({ id, name, emoji, price, quantity, variant: variant?.label || null })),
+        items: items.map(({ id, name, emoji, imageUrl, price, quantity, variant }) => ({ id, name, emoji, imageUrl: imageUrl || null, price, quantity, variant: variant?.label || null })),
         subtotal: totalPrice,
         discount: discountAmt,
         promoCode: appliedPromo?.code || null,
@@ -234,8 +234,13 @@ export default function Checkout() {
             {/* Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
               {o.items.map(item => (
-                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
-                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{item.emoji} {item.name} × {item.quantity}</span>
+                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, gap: 10 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text)', fontWeight: 600, minWidth: 0 }}>
+                    {item.imageUrl
+                      ? <img src={item.imageUrl} alt="" style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'cover', flexShrink: 0 }} />
+                      : <span style={{ flexShrink: 0 }}>{item.emoji}</span>}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name} × {item.quantity}</span>
+                  </span>
                   <span style={{ color: 'var(--text)', fontWeight: 700, flexShrink: 0 }}>{(item.price * item.quantity).toFixed(2)} {t('currency')}</span>
                 </div>
               ))}
@@ -355,7 +360,9 @@ export default function Checkout() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20, maxHeight: 280, overflowY: 'auto' }}>
                 {items.map(item => (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{item.emoji}</div>
+                    <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, overflow: 'hidden' }}>
+                      {item.imageUrl ? <img src={item.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : item.emoji}
+                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e', lineHeight: 1.3 }} className="line-clamp-2">{item.name}</div>
                       <div style={{ fontSize: 11, color: '#9ca3af' }}>× {item.quantity}</div>

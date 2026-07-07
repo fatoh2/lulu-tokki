@@ -42,6 +42,16 @@ const GALLERY_BG = {
   ],
 };
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  return isMobile;
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,6 +61,7 @@ export default function ProductDetail() {
   const [activePhoto, setActivePhoto] = useState(0);
   const [qty, setQty] = useState(1);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
+  const isMobile = useIsMobile();
 
   const product = products.find(p => p.id === Number(id));
 
@@ -160,7 +171,7 @@ export default function ProductDetail() {
       </nav>
 
       {/* Main Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 48, alignItems: 'start' }}>
 
         {/* Gallery */}
         <div>
