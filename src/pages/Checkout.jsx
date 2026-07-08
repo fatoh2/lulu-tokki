@@ -166,7 +166,7 @@ export default function Checkout() {
       console.error('Failed to save order', e);
     }
 
-    window.open(`https://wa.me/972504493660?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/972547639465?text=${encodeURIComponent(msg)}`, '_blank');
     setSubmittedOrder({
       items: [...items],
       subtotal: totalPrice,

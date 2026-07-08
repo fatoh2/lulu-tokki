@@ -85,8 +85,8 @@ export default function Accessibility() {
                 <li>البريد الإلكتروني: <strong>noorabutamam304@gmail.com</strong></li>
                 <li>
                   واتساب:{' '}
-                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
-                    +972-50-449-3660
+                  <a href="https://wa.me/972547639465" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
+                    +972-54-763-9465
                   </a>
                 </li>
               </ul>
@@ -159,8 +159,8 @@ export default function Accessibility() {
                 <li>Email: <strong>noorabutamam304@gmail.com</strong></li>
                 <li>
                   WhatsApp:{' '}
-                  <a href="https://wa.me/972504493660" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
-                    +972-50-449-3660
+                  <a href="https://wa.me/972547639465" target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: '#25d366', textDecoration: 'none', fontWeight: 700 }}>
+                    +972-54-763-9465
                   </a>
                 </li>
               </ul>

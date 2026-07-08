@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
               <p>لأي استفسارات متعلقة بالخصوصية:</p>
               <ul style={{ paddingInlineStart: 24, marginTop: 8 }}>
                 <li>البريد الإلكتروني: noorabutamam304@gmail.com</li>
-                <li>الهاتف: <span dir="ltr">+972-50-449-3660</span></li>
+                <li>الهاتف: <span dir="ltr">+972-54-763-9465</span></li>
                 <li>العنوان: باقة الغربية</li>
               </ul>
             </section>
